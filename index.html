@@ -1,0 +1,1099 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#f3f4f9" />
+<title>云舟健身</title>
+<style>
+/* ===== 基础 ===== */
+:root{
+  --bg:#f3f4f9; --card:#ffffff; --border:#e5e7eb;
+  --txt:#1f2937; --muted:#6b7280; --danger:#e53e3e;
+  --cmn:#f4b83b; --ok:#22c55e; --okbg:#16a34a;
+  --shadow:0 2px 10px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body,#app{height:100%}
+body{
+  font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--txt);
+  overflow:hidden;user-select:none;-webkit-user-select:none;
+  /* 安全区：确保内容不被状态栏/底部导航遮挡 */
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+#app{display:flex;flex-direction:column}
+.hidden{display:none!important}
+
+/* ===== 顶部标题栏 ===== */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:var(--card);border-bottom:1px solid var(--border);
+  flex:none;
+}
+.topbar .title{font-weight:700;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+.btn{
+  border:none;border-radius:9px;padding:7px 12px;font-size:13px;cursor:pointer;
+  background:#eef0f5;color:var(--txt);transition:background .15s;
+}
+.btn:active{background:#dde1ea}
+.btn.primary{background:#4f6ef7;color:#fff}
+.btn.danger{background:#fee2e2;color:var(--danger)}
+.btn.tw{background:#7c3aed;color:#fff}
+.btn:disabled{opacity:.5}
+
+/* ===== 内容区 ===== */
+main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;overscroll-behavior:contain;touch-action:none}
+.page{display:none}
+.page.active{display:block}
+
+/* ===== 磁贴 ===== */
+.tile{
+  background:var(--card);border:1px solid var(--border);border-radius:13px;
+  padding:12px;margin:0 0 10px;position:relative;
+  box-shadow:var(--shadow);transition:transform .18s ease,box-shadow .18s ease;
+  touch-action:none;cursor:pointer;
+  -webkit-user-select:none;user-select:none;
+  -webkit-touch-callout:none;
+}
+.tile .tile-head{display:flex;align-items:center;gap:8px}
+.tile .index{font-size:11px;color:var(--muted);min-width:14px}
+.tile .tile-name{flex:1;font-weight:600;font-size:15px;word-break:break-word}
+.tile .tile-actions{display:flex;gap:6px;flex:none}
+.tile-btn{
+  width:30px;height:30px;border-radius:8px;border:none;font-size:15px;line-height:1;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.tile-btn.set{background:#eef0f5;color:#374151}
+.check-btn{
+  background:var(--cmn);color:#5c4300;
+}
+.tile.done .check-btn{background:var(--okbg);color:#fff}
+.check-mark{font-size:15px}
+del-btn,.del-btn{background:#fde8e8;color:var(--danger)}
+.tile.done {opacity:.85}
+.done-row{position:absolute;right:10px;top:8px}
+/* 完成遮罩：置灰 */
+.tile.done{background:repeating-linear-gradient(45deg,#ebedf2,#ebedf2 6px,#e4e6ec 6px,#e4e6ec 12px)}
+.tile.done .tile-name{color:var(--muted)}
+.tile .sub-list{margin-top:8px;display:flex;flex-direction:column;gap:6px;padding-left:10px;border-left:2px solid #e6e8f0}
+
+/* 拖拽样式 */
+.tile.sorting{box-shadow:0 8px 20px rgba(0,0,0,.16);z-index:10;position:relative}
+.tile.placeholder{opacity:.3}
+/* 子磁贴 */
+.sub-tile{
+  display:flex;align-items:center;gap:8px;background:#f7f8fb;border:1px solid var(--border);
+  border-radius:9px;padding:8px 10px;position:relative;touch-action:none;
+}
+.sub-tile .sub-name{flex:1;font-size:14px}
+.sub-tile .sub-del{width:24px;height:24px;border:none;border-radius:6px;background:#fde8e8;color:var(--danger);font-size:12px;cursor:pointer}
+.sub-tile.done{background:#e8f5ec}
+.sub-tile.done .sub-name{color:var(--muted)}
+.sub-check{width:26px;height:26px;border:none;border-radius:7px;background:var(--cmn);font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#5c4300}
+.sub-check.done{background:var(--okbg);color:#fff}
+
+/* 磁贴色块 / 计数 / 运动按钮 */
+.mini-chip{width:30px;height:30px;border-radius:8px;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex:none;font-size:15px}
+.tile .cnt{font-size:11px;color:var(--muted);background:#f1f2f6;padding:2px 6px;border-radius:20px;flex:none}
+.wb-btn{border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;background:#eef0f5;color:var(--txt);flex:none}
+.wb-btn.on{background:#7c3aed;color:#fff}
+.tile.session{border-color:#7c3aed;box-shadow:0 0 0 2px rgba(124,58,237,.15)}
+.desc{font-size:12px;color:var(--muted);margin-top:6px}
+/* 拖拽把手 */
+.drag-handle{
+  width:32px;height:30px;border:none;border-radius:8px;background:#eef0f5;color:#6b7280;
+  font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;
+  cursor:grab;touch-action:none;flex:none;-webkit-user-select:none;user-select:none;
+}
+.drag-handle:active{background:#dde1ea;cursor:grabbing}
+
+/* 拖拽 */
+.tile.dragging{
+  box-shadow:0 14px 28px rgba(0,0,0,.25);opacity:.96;transition:none;cursor:grabbing;
+  will-change:transform;z-index:900;touch-action:none;pointer-events:none;
+}
+html.drag-lock,html.drag-lock body,html.drag-lock main{overflow:hidden!important;touch-action:none!important}
+.tile-placeholder{opacity:.3;background:#dbe1f8;border:2px dashed #4f6ef7;border-radius:13px}
+.tile.reflowing{transition:none;will-change:transform}
+
+/* ===== 弹窗 ===== */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:50;
+}
+.modal{
+  background:#fff;border-radius:14px;padding:18px;max-width:320px;width:calc(100% - 40px);
+  animation:pop .18s ease;box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+.modal h3{margin-bottom:8px;font-size:16px}
+.modal p{font-size:14px;color:var(--muted);margin-bottom:14px;line-height:1.5;white-space:pre-line}
+.modal .actions{display:flex;gap:8px;justify-content:flex-end}
+.modal .actions .btn{flex:1}
+
+/* ===== 编辑面板 ===== */
+.edit-body{display:flex;flex-direction:column;gap:12px;max-height:60vh;overflow-y:auto}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.field input[type=text]{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px}
+.palette{display:flex;flex-wrap:wrap;gap:8px}
+.swatch{width:32px;height:32px;border-radius:8px;cursor:pointer;border:2px solid transparent}
+.swatch.sel{border-color:#333}
+.edit-sub{display:flex;gap:6px;margin-bottom:6px;align-items:center}
+.edit-sub span{flex:1;font-size:13px}
+
+/* ===== 回收站 ===== */
+.bin-item{padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.bin-item .bin-name{flex:1;font-size:14px}
+.bin-item .bin-meta{font-size:11px;color:var(--muted)}
+
+/* ===== 日历 ===== */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-head .btn{width:34px;height:34px;padding:0}
+.cal-title{font-weight:700;font-size:16px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day{aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;font-size:14px;cursor:pointer}
+.cal-day.dim{color:#adb3bd}
+.cal-day.today{border:2px solid #4f6ef7}
+.cal-day.done{background:var(--okbg);color:#fff;font-weight:600}
+.cal-day.done .cal-tag{font-size:10px}
+.cal-tag{font-size:10px;color:var(--okbg);margin-top:1px}
+
+/* ===== 底部导航 ===== */
+.tabbar{
+  flex:none;display:flex;background:#fff;border-top:1px solid var(--border);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.tabbar .tab{
+  flex:1;padding:10px 0;text-align:center;font-size:12px;color:var(--muted);cursor:pointer;
+}
+.tabbar .tab.active{color:#4f6ef7;font-weight:600}
+.tabbar .tab .ico{font-size:20px;display:block;margin-bottom:2px}
+
+/* ===== 个人页 ===== */
+.me-sec-title{font-size:13px;color:var(--muted);margin:6px 0 8px;padding-left:4px}
+.me-card{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:14px;margin-bottom:10px;font-size:15px;cursor:pointer;
+}
+.me-card .me-arrow{color:#c1c6d0;font-size:18px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar" id="topbar">
+    <button class="btn" id="btnBack" title="返回上一级">‹ 返回</button>
+    <span class="title" id="topTitle">多套健身方案</span>
+    <div style="display:flex;gap:6px">
+      <button class="btn primary" id="btnAdd">＋ 添加</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- 页1：磁贴 -->
+    <div class="page active" id="page-tiles"></div>
+    <!-- 页2：日历 -->
+    <div class="page" id="page-cal">
+      <div class="cal-head">
+        <button class="btn" id="calPrev">‹</button>
+        <span class="cal-title" id="calTitle"></span>
+        <button class="btn" id="calNext">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+    <!-- 页3：个人页（回收站/导入导出） -->
+    <div class="page" id="page-me"><div id="meBody"></div></div>
+  </main>
+
+  <nav class="tabbar">
+    <div class="tab active" data-tab="tiles"><span class="ico">🏋️</span>计划</div>
+    <div class="tab" data-tab="cal"><span class="ico">📅</span>日历</div>
+    <div class="tab" data-tab="me"><span class="ico">👤</span>我的</div>
+  </nav>
+</div>
+
+<div class="overlay hidden" id="ovConfirm">
+  <div class="modal">
+    <h3 id="cfTitle">确认</h3>
+    <p id="cfText"></p>
+    <div class="actions">
+      <button class="btn" id="cfCancel">取消</button>
+      <button class="btn danger" id="cfOk">删除</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="ovEdit">
+  <div class="modal">
+    <h3 id="edTitle">编辑</h3>
+    <div class="edit-body">
+      <div class="field">
+        <label>名称</label>
+        <input type="text" id="edName" />
+      </div>
+      <div class="field">
+        <label>颜色</label>
+        <div class="palette" id="edPalette"></div>
+      </div>
+      <div class="field hidden" id="edDescRow">
+        <label>描述（可选）</label>
+        <input type="text" id="edDesc" placeholder="例如：周期四天" />
+      </div>
+      <div id="edSubs" style="display:flex;flex-direction:column;gap:4px"></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" id="edAddSub">＋ 添加子项</button>
+        <button class="btn primary" id="edSave" style="flex:1">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="ovBin">
+  <div class="modal">
+    <h3>回收站（最多5条）</h3>
+    <div id="binList" style="max-height:50vh;overflow-y:auto;margin:10px 0"></div>
+    <div class="actions">
+      <button class="btn" id="binClose">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="ovTransfer">
+  <div class="modal">
+    <h3 id="trTitle">导出 / 导入</h3>
+    <div id="trBody" style="max-height:56vh;overflow-y:auto;margin:10px 0;font-size:14px"></div>
+    <div class="actions">
+      <button class="btn" id="trClose">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="ovText">
+  <div class="modal">
+    <h3 id="txtTitle">提示</h3>
+    <p id="txtBody"></p>
+    <div class="actions"><button class="btn primary" id="txtOk">知道了</button></div>
+  </div>
+</div>
+
+<script>
+/* ================= 工具 ================= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* 调色板：全部亮色，无灰黑 */
+const PALETTE = ['#ff6b6b','#ff9f43','#feca57','#ffd166','#ff8fab','#ff6bcb','#a29bfe',
+  '#6c5ce7','#4f6ef7','#74b9ff','#54a0ff','#0abde3','#00cec9','#1dd1a1','#10ac84','#badc58',
+  '#51cf66','#94d82d','#ffe066','#ffa94d','#f783ac','#b197fc','#66d9e8'];
+const isBright = c => { try { const d=document.createElement('div');d.style.color=c;return d.style.color!=='';}catch{return true}};
+
+/* ================= 数据模型 ================= */
+const DB_KEY='yz_fitness_v1';
+let D = null; // {plans:[plan]}
+// plan:{id,name,desc?,'items':[tile]}   tile:{id,name,color,subs:[tile],done?}
+// 一级磁贴(方案/栏目/动作) 统一结构
+
+let state={path:[], page:'tiles'}; // path 为磁贴栈; page 当前页
+let bin=[]; // 回收站 [{tile, parentId, index, ts}]
+let workout={}; // 会话标记 {catId:true}
+
+function load(){
+  try{ D=JSON.parse(localStorage.getItem(DB_KEY))||defaultData(); }catch(e){ D=defaultData(); }
+  if(!D||!Array.isArray(D.plans)) D=defaultData();
+  bin=(D._bin)||[]; delete D._bin;
+}
+function save(){
+  const copy=JSON.parse(JSON.stringify({...D,_bin:bin}));
+  try{ localStorage.setItem(DB_KEY, JSON.stringify(copy)); }catch(e){ /* 空间不足忽略 */ }
+}
+function defaultData(){
+  return {
+    plans:[
+      {id:uid(),name:'健身方案1',
+       subs:[
+        {id:uid(),name:'胸肩',color:PALETTE[10],
+         subs:[{id:uid(),name:'卧推',color:PALETTE[5],subs:[]},
+               {id:uid(),name:'飞鸟',color:PALETTE[11],subs:[]},
+               {id:uid(),name:'推举',color:PALETTE[2],subs:[]}]},
+        {id:uid(),name:'背肩',color:PALETTE[7],
+         subs:[{id:uid(),name:'引体',color:PALETTE[9],subs:[]},
+               {id:uid(),name:'划船',color:PALETTE[12],subs:[]},
+               {id:uid(),name:'面拉',color:PALETTE[14],subs:[]}]},
+        {id:uid(),name:'腿',color:PALETTE[15],
+         subs:[{id:uid(),name:'深蹲',color:PALETTE[17],subs:[]},
+               {id:uid(),name:'腿举',color:PALETTE[18],subs:[]}]}
+       ]}
+    ]
+  };
+}
+
+/* ================= 状态/打卡 推导 ================= */
+function setSubtreeDone(t,v){ t.done=!!v; (t.subs||[]).forEach(s=>setSubtreeDone(s,v)); }
+// 真正的自动推导：自下而上（子树全打卡 → 父自动打卡；任一未打卡 → 父取消）
+function recomputeAll(node){
+  if(!node) return;
+  if(Array.isArray(node.subs) && node.subs.length){
+    for(const s of node.subs) recomputeAll(s);
+    node.done = node.subs.every(x=>!!x.done);
+  }
+  // 叶子(无子项)保持手动状态，不自动推导
+}
+// 全树统一推导：父级状态=所有子项都已打卡
+function recomputeAllTree(){
+  for(const p of (D.plans||[])) recomputeAll(p);
+  // 运动会话自动结束：某栏目所有子动作都被打卡
+  for(const p of (D.plans||[])) for(const c of (p.subs||[])){
+    if(workout[c.id] && (c.subs||[]).length && c.subs.every(e=>!!e.done)){
+      delete workout[c.id]; c.done=true;
+    }
+  }
+}
+function recomputeFromLevel(container){
+  for(const t of container) recomputeAll(t);
+  recomputeAllTree();
+}
+
+/* ================= 定位/查找 ================= */
+function getList(){
+  if(!state.path.length) return D.plans;
+  let node=D.plans.find(p=>p.id===state.path[0]);
+  for(let i=1;i<state.path.length;i++) node=(node?node.subs:[]).find(s=>s&&s.id===state.path[i]);
+  return node? node.subs||[] : [];
+}
+function getPathNames(){
+  if(!state.path.length) return [];
+  const names=[]; let node=D.plans.find(p=>p.id===state.path[0]); if(node) names.push(node.name);
+  for(let i=1;i<state.path.length;i++){ node=(node?node.subs:[]).find(s=>s&&s.id===state.path[i]); if(node) names.push(node.name); }
+  return names;
+}
+function findNodeById(id, root){
+  if(!id) return null;
+  root=root||D;
+  // 支持在 {plans:[]} 或纯数组上行走
+  const seed = Array.isArray(root) ? root : (Array.isArray(root.plans) ? root.plans : []);
+  for(const s of seed){ const r=walk(s); if(r) return r; }
+  return null;
+  function walk(node){
+    if(!node||!node.id) return null;
+    if(node.id===id) return node;
+    if(Array.isArray(node.subs)) for(const s of node.subs){ const r=walk(s); if(r) return r; }
+    return null;
+  }
+}
+function isLeaf(t){ return !t.subs || !t.subs.length }
+function countAllSubs(t){ let n=(t.subs||[]).length; for(const s of (t.subs||[])) n+=countAllSubs(s); return n; }
+const rndColor=()=>PALETTE[Math.floor(Math.random()*PALETTE.length)];
+const isPlanLevel=()=>state.path.length===0;
+const isCatLevel=()=>state.path.length===1;
+const isExLevel=()=>state.path.length>=2;
+
+/* ================= 渲染：磁贴页 ================= */
+function renderTiles(){
+  const list=getList();
+  // 顶部栏
+  const backVisible=state.path.length>0;
+  $('#topTitle').textContent=backVisible? getPathNames().join(' › '):'多套健身方案';
+  $('#btnAdd').textContent=(list.length? '＋ 添加':'＋ 添加');
+  $('#page-tiles').innerHTML = list.map((t,i)=>tileHTML(t,i,list)).join('') || emptyHTML();
+}
+function emptyHTML(){
+  const tip = isPlanLevel()? '还没有健身方案，点击右上角“＋ 添加”创建': isCatLevel()? '这个方案还没有栏目，点击“＋ 添加”创建栏目':'这个栏目还没有动作，点击“＋ 添加”添加动作';
+  return `<div style="text-align:center;color:var(--muted);padding:40px 0;font-size:14px">${tip}</div>`;
+}
+function tileHTML(t,i){
+  const cn = isCatLevel();           // 栏目层 → 显示“运动/结束”
+  const sessionOn = workout[t.id];
+  const kids = (t.subs&&t.subs.length)? t.subs.length:null;
+  const hasKids = kids!=null;
+  return `<div class="tile${t.done?' done':''}${sessionOn?' session':''}" data-id="${t.id}" style="--tc:${t.color}">
+    <div class="tile-head">
+      <span class="mini-chip" style="background:${t.color}">${esc(t.name[0]||'?')}</span>
+      <span class="tile-name">${esc(t.name)}</span>
+      ${hasKids?`<span class="cnt">${kids}项</span>`:''}
+      ${cn?`<button class="wb-btn${sessionOn?' on':''}" data-wb="${t.id}">${sessionOn?'结束':'运动'}</button>`:''}
+      <div class="tile-actions">
+        <button class="drag-handle" data-handle="${t.id}" title="长按或拖动排序">≡</button>
+        <button class="tile-btn set" data-set="${t.id}" title="编辑">⚙</button>
+        <button class="tile-btn check${t.done?' on':''}" data-check="${t.id}">${t.done?'✓':'√'}</button>
+        <button class="tile-btn del" data-del="${t.id}">✕</button>
+      </div>
+    </div>
+    ${t.desc?`<div class="desc">${esc(t.desc)}</div>`:''}
+  </div>`;
+}
+
+// 事件委托：磁贴页（点击进入子层/编辑；拖拽结束后短暂屏蔽误触）
+/* 磁贴点击统一处理见文件后部（此处不可再绑定第二份，否则打卡/进入下一级会触发两次） */
+
+/* ================= 打卡 ================= */
+function toggleCheck(id){
+  const t=findNodeById(id); if(!t) return;
+  // 打卡/取消打卡：切换一次即可；叶子手动状态，父级由子项推导
+  const newVal=!t.done;
+  setSubtreeDone(t,newVal);
+  recomputeFromLevel(D.plans);
+  save(); renderTiles(); renderCal();
+}
+// 顶部栏：返回上一级 / 回到首页
+function goBack(){
+  if(state.page!=='tiles'){ switchTab('tiles'); return; }   // 若在日历页先回计划页
+  if(state.path.length){ state.path.pop(); renderTiles(); }
+  // path 已空 → 返回键交给系统（第三层退出）
+}
+function goHome(){ state.path=[]; switchTab('tiles'); }
+$('#btnBack').addEventListener('click', goBack);
+$('#btnAdd').addEventListener('click', ()=>{
+  // 点击“添加”仅打开编辑面板，保存后才真正生成磁贴
+  editing={id:uid(), name:'', color:rndColor(), subs:[], _isDraft:true}; // 草稿
+  openEdit(editing, true, true);
+});
+
+/* ================= 删除 + 回收站 ================= */
+function backupToBin(tile, parentId, index){
+  bin.unshift({tile:JSON.parse(JSON.stringify(tile)), parentId, index, ts:Date.now()});
+  if(bin.length>5) bin.pop();
+  save();
+}
+function startDelete(id){
+  const list=getList(); const idx=list.findIndex(x=>x.id===id);
+  if(idx<0) return; const t=list[idx];
+  const hasKids=(t.subs&&t.subs.length)?true:false;
+  const kidsTotal=countAllSubs(t);
+  confirmModal(`删除“${t.name}”？`, hasKids? `“${t.name}”包含 ${t.subs.length} 个子项（共 ${kidsTotal} 个节点），删除后可在回收站恢复。`:'删除后可在回收站恢复。', ()=>{
+    if(hasKids){
+      confirmModal(`再次确认：删除“${t.name}”及其子项`, `确定要一并删除 ${kidsTotal+1} 个节点吗？这将先从回收站检查可恢复性。`, ()=>doDelete(idx,t,list), '删除');
+    } else doDelete(idx,t,list);
+  },'删除');
+}
+function doDelete(idx,t,list){
+  const parentId=state.path.length? state.path[state.path.length-1]:null;
+  backupToBin(t, parentId, idx);
+  list.splice(idx,1);
+  // 删除后整树重新推导：若剩余兄弟全打卡 → 父级自动打卡；否则父级取消
+  recomputeFromLevel(D.plans);
+  save(); renderTiles(); renderCal();
+}
+function openBin(){
+  $('#binList').innerHTML = bin.length? bin.map((b,i)=>{
+    const sub=(b.tile.subs&&b.tile.subs.length)? `(${b.tile.subs.length}个子项)`:'';
+    return `<div class="bin-item">
+      <span style="width:10px;height:10px;border-radius:50%;display:inline-block;background:${b.tile.color}"></span>
+      <span class="bin-name">${esc(b.tile.name)} ${esc(sub)}</span>
+      <span class="bin-meta">${new Date(b.ts).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span>
+      <button class="btn primary" data-restore="${i}">恢复</button>
+    </div>`;
+  }).join('') : '<p style="color:var(--muted);text-align:center;font-size:13px;padding:16px 0">回收站是空的</p>';
+  showModal('ovBin');
+}
+$('#binList').addEventListener('click', e=>{
+  const b=e.target.closest('[data-restore]'); if(!b) return;
+  const i=+b.dataset.restore; const bk=bin[i]; if(!bk) return;
+  confirmModal('恢复该备份？',`将把“${bk.tile.name}”恢复到原位置${bk.parentId?'':'（方案列表）'}。`, ()=>{
+    if(bk.parentId==null){
+      D.plans.splice(Math.min(bk.index,D.plans.length),0,bk.tile);
+    }else{
+      const parent=findNodeById(bk.parentId);
+      if(!parent){ alert('原位置已不存在，无法恢复'); return; }
+      (parent.subs||[]).splice(Math.min(bk.index,parent.subs.length),0,bk.tile);
+    }
+    bin.splice(i,1);
+    save(); renderTiles(); renderCal();
+    openBin();
+  },'恢复');
+});
+$('#binClose').addEventListener('click', ()=>hideModal('ovBin'));
+$('#ovBin').addEventListener('click', e=>{ if(e.target.id==='ovBin') hideModal('ovBin'); });
+
+/* ================= 导出 / 导入 方案 ================= */
+// 统一文件格式：{ app:'yzfitness', version:1, plans:[...] }
+const isNativeCap=()=> !!(window.Capacitor && window.Capacitor.isNativePlatform());
+
+// 导出单个方案 → 生成JSON文件
+function exportPlan(plan){
+  const data={ app:'yzfitness', version:1, plans:[ JSON.parse(JSON.stringify(plan)) ] };
+  const text=JSON.stringify(data,null,2);
+  const fname= safeName(plan.name)+'-'+stamp()+'.yzplan.json';
+
+  // 1) 原生：MediaStore 写入系统「下载」目录（Android 10+ 免存储权限，vivo/文件管理可见）
+  // 2) 失败则写入应用缓存并调起系统分享，由用户保存到手机
+  // 3) 提示文案只描述真实结果，不再谎称已进下载目录
+  const saveNative=async ()=>{
+    const Yz=window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.YzExport;
+    if(!Yz || !Yz.saveToDownloads) return false;
+    try{
+      const res=await Yz.saveToDownloads({ fileName:fname, content:text });
+      const where=(res && res.path) ? res.path : '手机「下载」文件夹';
+      msg('已导出「'+plan.name+'」\n位置：'+where+'\n可在系统文件管理的「下载」中查看。');
+      return true;
+    }catch(e){ return false; }
+  };
+
+  const shareFallback=async ()=>{
+    try{
+      const FS=window.Capacitor.Plugins.Filesystem;
+      await FS.writeFile({ path:fname, data:text, directory:FS.Directory.Cache, encoding:FS.Encoding.UTF8 });
+      let uri=fname;
+      try{
+        const got=await FS.getUri({ path:fname, directory:FS.Directory.Cache });
+        uri=got && got.uri ? got.uri : fname;
+      }catch(e){}
+      await window.Capacitor.Plugins.Share.share({
+        title:'导出健身方案',
+        text:plan.name+'\n请在分享面板中选择「保存到文件 / 下载」',
+        url:uri,
+        dialogTitle:'分享 / 保存健身方案'
+      });
+      msg('已生成「'+plan.name+'」。\n若要留档，请在系统分享面板中选择「保存到文件」或「下载」。');
+    }catch(err){
+      msg('导出失败：'+(err && err.message ? err.message : '无法写入或分享文件'));
+    }
+  };
+
+  const doShare=async ()=>{
+    const ok=await saveNative();
+    if(ok) return;
+    if(isNativeCap()) await shareFallback();
+    else{
+      const blob=new Blob([text],{type:'application/json;charset=utf-8'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob); a.download=fname; a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+      msg('已导出「'+plan.name+'」：'+fname);
+    }
+  };
+
+  if(isNativeCap()) doShare();
+  else{
+    const blob=new Blob([text],{type:'application/json;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download=fname; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    msg('已导出「'+plan.name+'」：'+fname);
+  }
+}
+function safeName(s){ return (s||'方案').replace(/[\\/:*?"<>|]/g,'_').slice(0,20); }
+function stamp(){ const d=new Date(); const p=n=>String(n).padStart(2,'0'); return ''+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds()); }
+
+// 校验并规范化导入的方案
+function normalizePlans(raw){
+  let obj;
+  try{ obj=typeof raw==='string'? JSON.parse(raw): raw; }
+  catch(e){ throw new Error('不是有效的JSON文件'); }
+  const arr = Array.isArray(obj) ? obj : (Array.isArray(obj&&obj.plans)? obj.plans: null);
+  if(!arr || !arr.length) throw new Error('文件里没有健身方案');
+  // 逐条规范化：确保有 id/name/color/subs
+  const fix=(t, isPlan)=>{
+    if(!t||typeof t!=='object') return null;
+    t.id = t.id||uid();
+    t.name = (t.name||'').trim()||'未命名';
+    t.color = PALETTE.includes(t.color)? t.color : rndColor();
+    t.done = !!t.done;
+    t.desc = t.desc||undefined;
+    t.subs = Array.isArray(t.subs)? t.subs.map(s=>fix(s)).filter(Boolean) : [];
+    return t;
+  };
+  return arr.map(p=>fix(p)).filter(Boolean);
+}
+
+// 打开传输面板（导出选择 / 导入入口）
+function openTransfer(){
+  const plans=D.plans||[];
+  if(!plans.length){
+    $('#trBody').innerHTML='<p style="color:var(--muted);text-align:center;padding:16px 0;font-size:13px">暂无方案可导出。可先在“＋ 添加”创建方案。</p>';
+  }else{
+    $('#trBody').innerHTML=`<p style="font-size:13px;color:var(--muted);margin-bottom:8px">选择要导出的方案（一个文件）</p>`+
+      plans.map((p,i)=>`<div class="bin-item" style="margin-bottom:8px">
+        <span style="width:10px;height:10px;border-radius:50%;display:inline-block;background:${p.color}"></span>
+        <span class="bin-name">${esc(p.name)}${p.subs&&p.subs.length?` <span style="color:var(--muted);font-size:12px">(${p.subs.length}个栏目)</span>`:''}</span>
+        <button class="btn primary" data-exp="${p.id}">导出</button>
+      </div>`).join('')+
+      `<div style="border-top:1px solid var(--border);margin:10px 0"></div>
+       <button class="btn tw" id="trImport" style="width:100%">📥 从文件导入方案</button>`;
+  }
+  showModal('ovTransfer');
+}
+// 传输面板内事件委托（关闭、导出、导入都在 ovTransfer 上）
+$('#ovTransfer').addEventListener('click', e=>{
+  if(e.target.closest('#trClose') || e.target.id==='ovTransfer'){ hideModal('ovTransfer'); return; }
+  const ex=e.target.closest('[data-exp]');
+  if(ex){ const p=D.plans.find(x=>x.id===ex.dataset.exp); if(p) exportPlan(p); return; }
+  const imp=e.target.closest('#trImport');
+  if(imp){ hideModal('ovTransfer'); doImport(); }
+});
+// 关闭按钮独立绑定
+$('#trClose').addEventListener('click', ()=>hideModal('ovTransfer'));
+// 导入：文件选择器（原生用 Capacitor Filesystem 的 showPicker，Web 用 input）
+function doImport(){
+  const pick = (input)=>{
+    input.type='file'; input.accept='.json,.yzplan,application/json';
+    input.onchange=e=>{ const f=e.target.files[0]; if(!f) return; readFileToImport(f); };
+    input.click();
+  };
+  if(isNativeCap()){
+    try{
+      const inp=document.createElement('input');
+      document.body.appendChild(inp);
+      pick(inp);
+      setTimeout(()=>inp.remove(), 10000);
+    }catch(e){ msg('无法打开文件选择器'); }
+  }else{
+    const inp=document.createElement('input');
+    document.body.appendChild(inp);
+    pick(inp);
+    setTimeout(()=>inp.remove(), 10000);
+  }
+}
+function readFileToImport(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const list=normalizePlans(reader.result);
+      // 确认导入
+      confirmModal('导入健身方案？',`将导入 ${list.length} 个方案：${list.map(p=>'「'+p.name+'」').join('、')}。导入后会添加到方案列表末尾。`, ()=>{
+        D.plans.push(...list);
+        recomputeFromLevel(D.plans);
+        save(); renderTiles(); renderCal();
+        hideModal('ovTransfer');
+        msg('已导入 '+list.length+' 个方案');
+      },'导入');
+    }catch(err){ msg('导入失败：'+err.message); }
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+/* ================= 编辑面板 ================= */
+let editing=null;
+function makeTile(){ return {id:uid(), name:'', color:rndColor(), subs:[]}; }
+function openEdit(t, isNew, isDraft){
+  editing=t; $('#edName').value=t.name||'';
+  $('#ovEdit h3').textContent=(isNew?'添加': (isLeaf(t)?'编辑动作':'编辑'));
+  // 名称/描述
+  $('#edName').placeholder='名称';
+  // 描述行（仅方案层/非叶子）
+  const descRow=$('#edDescRow');
+  if(descRow){ descRow.classList.toggle('hidden', isLeaf(t)); if($('#edDesc')) $('#edDesc').value=t.desc||''; }
+  // 调色板
+  $('#edPalette').innerHTML=PALETTE.map(c=>`<span class="swatch${t.color===c?' sel':''}" data-c="${c}" style="background:${c}"></span>`).join('');
+  // 子项列表（非叶子）
+  const subsBox=$('#edSubs');
+  if(isLeaf(t)){ subsBox.innerHTML='<p style="color:var(--muted);font-size:12px">子动作在上级栏目中添加</p>'; $('#edAddSub').style.display='none'; }
+  else{
+    subsBox.innerHTML=(t.subs||[]).map((s,i)=>`<div class="edit-sub"><span>${i+1}. ${esc(s.name)}</span><button class="btn danger" data-rm="${s.id}" style="padding:3px 8px;font-size:12px">✕</button></div>`).join('') || '<p style="color:var(--muted);font-size:12px">暂无子项</p>';
+    $('#edAddSub').style.display='inline-block';
+  }
+  showModal('ovEdit');
+}
+// 分享函数：编辑面板内按钮（用委托）
+$('#edPalette').addEventListener('click', e=>{ const s=e.target.closest('.swatch'); if(s){ $$('#edPalette .swatch').forEach(x=>x.classList.remove('sel')); s.classList.add('sel'); } });
+$('#edSubs').addEventListener('click', e=>{
+  const rm=e.target.closest('[data-rm]'); if(!rm||!editing||!editing.subs) return;
+  confirmModal('删除子项？',`将删除“${editing.subs.find(s=>s.id===rm.dataset.rm)?.name}”。`, ()=>{
+    editing.subs=editing.subs.filter(s=>s.id!==rm.dataset.rm);
+    openEdit(editing);
+  },'删除');
+});
+$('#edAddSub').addEventListener('click', ()=>{ if(!editing) return; (editing.subs=editing.subs||[]).push({id:uid(),name:'新动作',color:rndColor(),subs:[]}); openEdit(editing); });
+$('#edSave').addEventListener('click', ()=>{
+  if(!editing) return;
+  editing.name=($('#edName').value||'').trim()||'未命名';
+  if($('#edDesc')&&!$('#edDescRow').classList.contains('hidden')) editing.desc=$('#edDesc').value.trim()||undefined;
+  const sel=$('#edPalette .swatch.sel'); if(sel) editing.color=sel.dataset.c;
+  // 判断是新增草稿还是编辑已存在项
+  if(editing._isDraft){
+    delete editing._isDraft;
+    getList().push(editing);
+  }
+  hideModal('ovEdit'); editing=null;
+  // 新增/改动后父级状态重新检查（若兄弟全打卡而新项未打卡 → 父取消）
+  recomputeFromLevel(D.plans);
+  save(); renderTiles(); renderCal();
+});
+$('#ovEdit').addEventListener('click', e=>{ if(e.target.id==='ovEdit') hideModal('ovEdit'); });
+
+/* ================= 运动 / 结束 会话 ================= */
+function toggleWorkout(catId){
+  const cat=findNodeById(catId); if(!cat) return;
+  if(!workout[catId]){
+    // 开始：全子项置未打卡 + 栏目高亮
+    setSubtreeDone(cat,false); cat.done=false;
+    workout[catId]=true;
+    logDay(todayKey());
+  }else{
+    // 结束：栏目及所有子项打卡
+    setSubtreeDone(cat,true); cat.done=true;
+    delete workout[catId];
+    logDay(todayKey());
+  }
+  // 会话结束后整树重新推导，确保父级(方案)随栏目全打卡而自动打卡
+  recomputeFromLevel(D.plans);
+  save(); renderTiles(); renderCal();
+}
+
+/* ================= 日历 ================= */
+let ACT={days:{}};
+function actData(){ let raw=localStorage.getItem('yz_activity'); try{const o=JSON.parse(raw);return (o&&o.days)?o:{days:{}};}catch{return {days:{}};} }
+const todayKey=()=>{ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+function logDay(k){ if(!ACT.days[k]) ACT.days[k]=0; ACT.days[k]++; persistAct(); }
+function persistAct(){ try{ localStorage.setItem('yz_activity', JSON.stringify(ACT)); }catch(e){} }
+let CAL={y:new Date().getFullYear(), m:new Date().getMonth()};
+function renderCal(){
+  const y=CAL.y, m=CAL.m;
+  $('#calTitle').textContent=`${y}年${m+1}月`;
+  const first=new Date(y,m,1).getDay();
+  const days=new Date(y,m+1,0).getDate();
+  const td=new Date(); const todayStr=td.getFullYear()+'-'+String(td.getMonth()+1).padStart(2,'0')+'-'+String(td.getDate()).padStart(2,'0');
+  let html='<div class="cal-day dim" style="color:var(--muted);font-size:12px">日</div><div class="cal-day dim" style="color:var(--muted);font-size:12px">一</div><div class="cal-day dim" style="color:var(--muted);font-size:12px">二</div><div class="cal-day dim" style="color:var(--muted);font-size:12px">三</div><div class="cal-day dim" style="color:var(--muted);font-size:12px">四</div><div class="cal-day dim" style="color:var(--muted);font-size:12px">五</div><div class="cal-day dim" style="color:var(--muted);font-size:12px">六</div>';
+  for(let i=0;i<first;i++) html+='<div></div>';
+  for(let d=1;d<=days;d++){
+    const k=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const done=!!ACT.days[k];
+    const today=k===todayStr;
+    html+=`<div class="cal-day${done?' done':''}${today?' today':''}">${d}${done?`<span class="cal-tag">练</span>`:''}</div>`;
+  }
+  $('#calGrid').innerHTML=html;
+}
+$('#calPrev').addEventListener('click', ()=>{ CAL.m--; if(CAL.m<0){CAL.m=11;CAL.y--;} renderCal(); });
+$('#calNext').addEventListener('click', ()=>{ CAL.m++; if(CAL.m>11){CAL.m=0;CAL.y++;} renderCal(); });
+
+/* ================= 底部导航 ================= */
+function switchTab(name){
+  state.page=name;
+  $$('.tab').forEach(el=>el.classList.toggle('active', el.dataset.tab===name));
+  $('#page-tiles').classList.toggle('active', name==='tiles');
+  $('#page-cal').classList.toggle('active', name==='cal');
+  $('#page-me').classList.toggle('active', name==='me');
+  if(name==='cal') renderCal();
+  if(name==='me') renderMe();
+}
+$$('.tab').forEach(el=>el.addEventListener('click', ()=>switchTab(el.dataset.tab)));
+
+/* ================= 个人页（回收站 / 导出导入） ================= */
+function renderMe(){
+  $('#meBody').innerHTML=`
+    <div class="me-sec-title">数据管理</div>
+    <div class="me-card" id="meCardTransfer">⇅ 导出 / 导入方案 <span class="me-arrow">›</span></div>
+    <div class="me-card" id="meCardBin">🗑 回收站 <span class="me-arrow">›</span></div>
+    <div class="me-sec-title" style="margin-top:18px">关于</div>
+    <div class="me-card" style="justify-content:center;color:var(--muted);font-size:13px">云舟健身 · 本地数据</div>`;
+  $('#meCardTransfer').addEventListener('click', openTransfer);
+  $('#meCardBin').addEventListener('click', openBin);
+}
+
+/* ================= 弹窗组件 ================= */
+let confirmCb=null;
+let topZ=60; // 弹窗层级计数器：保证新弹窗始终在上层
+function showModal(id){
+  const el=document.getElementById(id);
+  el.classList.remove('hidden');
+  el.style.zIndex=++topZ;   // 每次显示自增，新弹窗必在旧弹窗之上
+}
+function hideModal(id){ document.getElementById(id).classList.add('hidden'); }
+function confirmModal(title, text, cb, okText){
+  $('#cfTitle').textContent=title;
+  $('#cfText').textContent=text;
+  $('#cfOk').textContent=okText||'确定';
+  confirmCb=cb;
+  showModal('ovConfirm');
+}
+$('#cfCancel').addEventListener('click', ()=>{ hideModal('ovConfirm'); confirmCb=null; });
+$('#cfOk').addEventListener('click', ()=>{ const cb=confirmCb; confirmCb=null; hideModal('ovConfirm'); cb&&cb(); });
+$('#ovConfirm').addEventListener('click', e=>{ if(e.target.id==='ovConfirm'){ hideModal('ovConfirm'); confirmCb=null; } });
+function msg(t){ $('#txtTitle').textContent='提示'; $('#txtBody').textContent=t; showModal('ovText'); }
+$('#txtOk').addEventListener('click', ()=>hideModal('ovText'));
+
+/* ================= 拖拽排序 + 自管滚动 ================= */
+/* 磁贴 touch-action:none，浏览器不再抢手势；列表滚动由 JS 实现，拖拽才能真正跟手 */
+let dragActive=false, dragData=null;
+let suppressClickUntil=0;
+
+function lockScroll(on){
+  document.documentElement.classList.toggle('drag-lock', !!on);
+  const main=document.querySelector('main');
+  if(main){
+    if(on){ main.style.overflowY='hidden'; main.style.touchAction='none'; }
+    else{ main.style.overflowY=''; main.style.touchAction='none'; }
+  }
+}
+
+function setupDrag(){
+  const container=$('#page-tiles');
+  const scroller=document.querySelector('main');
+  let tile=null, pressTimer=null;
+  let startX=0, startY=0, lastX=0, lastY=0;
+  let started=false, moved=false, activeId=0;
+  // 自管滚动状态
+  let scrolling=false, scrollStartY=0, scrollStartTop=0, scrollLastY=0, scrollLastT=0, scrollV=0;
+
+  const isDragTarget=(e)=>{
+    const handle=e.target.closest && e.target.closest('[data-handle]');
+    if(handle) return handle.closest('.tile');
+    const el=e.target.closest && e.target.closest('.tile');
+    if(!el) return null;
+    // 按钮不作为拖拽起点（排序把手除外）
+    if(e.target.closest('button') && !handle) return null;
+    return el;
+  };
+
+  const onMove=(e)=>{
+    if(started && dragData){
+      if(e.cancelable) e.preventDefault();
+      e.stopPropagation();
+      const t=e.touches? e.touches[0] : e;
+      if(t){ lastX=t.clientX; lastY=t.clientY; dragMove(t); }
+      return;
+    }
+    // 自管滚动：touch-action:none 下原生滚动被关，这里手动滚
+    if(scrolling && scroller && e.touches && e.touches[0]){
+      if(e.cancelable) e.preventDefault();
+      const y=e.touches[0].clientY;
+      const now=performance.now();
+      const dy=y-scrollLastY;
+      const dt=Math.max(now-scrollLastT, 1);
+      scrollV=dy/dt;
+      scroller.scrollTop = scrollStartTop - (y - scrollStartY);
+      scrollLastY=y; scrollLastT=now;
+    }
+  };
+  // 两个阶段都要非 passive，才能 preventDefault
+  document.addEventListener('touchmove', onMove, {passive:false, capture:true});
+
+  container.addEventListener('touchstart', e=>{
+    if(e.touches.length!==1) return;
+    if(e.target.closest('.cal-day')) return;
+
+    const t=e.touches[0];
+    startX=lastX=t.clientX; startY=lastY=t.clientY;
+    moved=false; started=false;
+    tile=null;
+
+    // 开始自管滚动（手指在列表上）
+    scrolling=true;
+    scrollStartY=t.clientY;
+    scrollStartTop=scroller? scroller.scrollTop : 0;
+    scrollLastY=t.clientY;
+    scrollLastT=performance.now();
+    scrollV=0;
+
+    const el=isDragTarget(e);
+    if(!el) return;
+    // handle starts immediately in a separate listener; do not also arm long-press
+    if(e.target.closest('[data-handle]')) return;
+    tile=el;
+
+    const myId=++activeId;
+    clearTimeout(pressTimer);
+    pressTimer=setTimeout(()=>{
+      if(myId!==activeId || moved || !tile) return;
+      started=true; dragActive=true; scrolling=false;
+      beginDrag(tile, {clientX:lastX, clientY:lastY});
+      lockScroll(true);
+    }, 320);
+  }, {passive:true});
+
+  container.addEventListener('touchmove', e=>{
+    if(started) return;
+    const t=e.touches[0]; if(!t) return;
+    lastX=t.clientX; lastY=t.clientY;
+    if(Math.abs(t.clientX-startX)+Math.abs(t.clientY-startY)>10){
+      moved=true;
+      clearTimeout(pressTimer);
+    }
+  }, {passive:true});
+
+  // 把手：立即可拖（不必等长按），跟手更稳
+  container.addEventListener('touchstart', e=>{
+    const handle=e.target.closest && e.target.closest('[data-handle]');
+    if(!handle || e.touches.length!==1) return;
+    const el=handle.closest('.tile');
+    if(!el) return;
+    const t=e.touches[0];
+    tile=el; moved=false; started=true; dragActive=true; scrolling=false;
+    lastX=t.clientX; lastY=t.clientY;
+    clearTimeout(pressTimer);
+    beginDrag(el, {clientX:t.clientX, clientY:t.clientY});
+    lockScroll(true);
+  }, {passive:true});
+
+  const fin=(e)=>{
+    if(started && e && e.touches && e.touches.length>0) return;
+    clearTimeout(pressTimer);
+    activeId++;
+    if(started && dragData){
+      endDrag();
+      suppressClickUntil=Date.now()+350;
+    }
+    // 惯性滚动
+    if(scrolling && scroller && !dragActive && Math.abs(scrollV)>0.05){
+      let v=scrollV*16;
+      const step=()=>{
+        if(Math.abs(v)<0.2) return;
+        scroller.scrollTop -= v;
+        v*=0.95;
+        requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+    scrolling=false;
+    lockScroll(false);
+    started=false; moved=false; tile=null; dragActive=false;
+  };
+  window.addEventListener('touchend', fin);
+  window.addEventListener('touchcancel', fin);
+}
+
+function beginDrag(tile, ev){
+  const list=getList();
+  const idx=list.findIndex(t=>t.id===tile.dataset.id);
+  if(idx<0){ dragData=null; return; }
+  const rect=tile.getBoundingClientRect();
+  const ph=document.createElement('div');
+  ph.className='tile-placeholder';
+  ph.style.height=rect.height+'px';
+  ph.style.marginBottom='10px';
+  tile.parentNode.insertBefore(ph, tile);
+  tile.classList.add('dragging');
+  tile.style.width=rect.width+'px';
+  tile.style.margin='0';
+  tile.style.position='fixed';
+  tile.style.left=rect.left+'px';
+  tile.style.top=rect.top+'px';
+  tile.style.zIndex='900';
+  tile.style.transition='none';
+  tile.style.touchAction='none';
+  tile.style.transform='translate3d(0,0,0)';
+  dragData={
+    tile, list, idx, ph, curIdx:idx,
+    rect,
+    grabX: ev.clientX - rect.left,
+    grabY: ev.clientY - rect.top,
+    dx:0, dy:0
+  };
+  applyDragTransform(ev.clientX, ev.clientY);
+}
+
+function applyDragTransform(clientX, clientY){
+  const d=dragData; if(!d) return;
+  d.dx = clientX - d.grabX - d.rect.left;
+  d.dy = clientY - d.grabY - d.rect.top;
+  d.tile.style.transform=`translate3d(${d.dx}px, ${d.dy}px, 0)`;
+}
+
+function dragMove(ev){
+  const d=dragData; if(!d) return;
+  applyDragTransform(ev.clientX, ev.clientY);
+  const now=ev.clientY;
+  const others=$$('#page-tiles .tile').filter(el=>el!==d.tile);
+  let above=0;
+  others.forEach(el=>{
+    const r=el.getBoundingClientRect();
+    if(r.top + r.height/2 < now) above++;
+  });
+  const expected=Math.min(above, Math.max(d.list.length-1, 0));
+  if(expected===d.curIdx) return;
+  const parent=d.ph.parentNode;
+  if(!parent) return;
+  const phEl=d.ph;
+  parent.removeChild(phEl);
+  const others2=[...parent.children].filter(c=>c.classList.contains('tile') && c!==d.tile);
+  const anchor = others2[expected] || null;
+  if(anchor) parent.insertBefore(phEl, anchor);
+  else parent.appendChild(phEl);
+  d.curIdx=expected;
+  animateReflow(d.tile);
+}
+
+function animateReflow(dragTile){
+  const parent=dragTile.parentNode;
+  if(!parent) return;
+  const nodes=[...parent.children].filter(c=>c.classList.contains('tile')&&c!==dragTile);
+  const prev=new Map(); nodes.forEach(n=>prev.set(n, n.getBoundingClientRect().top));
+  requestAnimationFrame(()=>{
+    nodes.forEach(n=>{
+      const now=n.getBoundingClientRect().top; const p=prev.get(n); const dy=p-now;
+      if(Math.abs(dy)>0.5){
+        n.classList.add('reflowing');
+        n.style.transform=`translateY(${dy}px)`;
+      }
+    });
+    requestAnimationFrame(()=>{
+      nodes.forEach(n=>{
+        if(n.classList.contains('reflowing')){
+          n.style.transition='transform .18s ease';
+          n.style.transform='';
+          n.classList.remove('reflowing');
+        }
+      });
+    });
+  });
+}
+
+function endDrag(){
+  const d=dragData; if(!d) return;
+  const [item]=d.list.splice(d.idx,1);
+  d.list.splice(Math.min(d.curIdx, d.list.length),0,item);
+  const tile=d.tile;
+  tile.style.position=''; tile.style.left=''; tile.style.top=''; tile.style.width='';
+  tile.style.margin=''; tile.style.zIndex=''; tile.style.transition='';
+  tile.style.transform=''; tile.style.touchAction='';
+  tile.classList.remove('dragging');
+  if(d.ph && d.ph.parentNode) d.ph.remove();
+  save();
+  dragActive=false; dragData=null;
+  renderTiles();
+}
+
+setupDrag();
+/* ===== 磁贴点击（点击进入子层/编辑），拖拽结束后屏蔽误触 ===== */
+$('#page-tiles').addEventListener('click', e=>{
+  if(Date.now()<suppressClickUntil){ e.stopImmediatePropagation(); return; }
+  // 排序把手不进入编辑/下一级
+  if(e.target.closest('[data-handle]')){ e.stopImmediatePropagation(); return; }
+  const check=e.target.closest('[data-check]');
+  if(check){ e.stopImmediatePropagation(); toggleCheck(check.dataset.check); return; }
+  const del=e.target.closest('[data-del]');
+  if(del){ e.stopImmediatePropagation(); startDelete(del.dataset.del); return; }
+  const wb=e.target.closest('[data-wb]');
+  if(wb){ e.stopImmediatePropagation(); toggleWorkout(wb.dataset.wb); return; }
+  const setBtn=e.target.closest('[data-set]');
+  if(setBtn){ e.stopImmediatePropagation(); const t=findNodeById(setBtn.dataset.set); if(t) openEdit(t); return; }
+  const tile=e.target.closest('.tile');
+  if(tile && !dragActive){
+    e.stopImmediatePropagation();
+    const t=findNodeById(tile.dataset.id);
+    if(t && t.subs && t.subs.length){ state.path.push(t.id); renderTiles(); }
+    else if(t){ openEdit(t); }
+  }
+});
+
+/* ================= 初始化 ================= */
+function init(){
+  load();
+  ACT=actData();
+  workout={};
+  renderTiles();
+  renderCal();
+  switchTab('tiles');
+  // Android 物理返回键拦截：先关弹窗→退1级→回首页→进后台(不直接退出)
+  try{
+    const Cap = window.Capacitor;
+    if(Cap && Cap.Plugins && Cap.Plugins.App){
+      Cap.Plugins.App.addListener('backButton', ()=>{
+        const openOverlay = document.querySelector('.overlay:not(.hidden)');
+        if(openOverlay){ openOverlay.classList.add('hidden'); return; }
+        if(state.page!=='tiles'){ switchTab('tiles'); return; }
+        if(state.path.length){ state.path.pop(); renderTiles(); return; }
+        // 最顶层：进后台而非退出
+        Cap.Plugins.App.minimizeApp();
+      });
+    }
+  }catch(e){}
+  document.title='云舟健身';
+}
+init();
+</script>
+</body>
+</html>

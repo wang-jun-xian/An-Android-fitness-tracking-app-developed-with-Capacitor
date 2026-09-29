@@ -1,0 +1,37 @@
+# --- 依赖 ---
+node_modules/
+
+# --- 构建产物 ---
+dist/
+*.apk
+*.aab
+
+# --- 密钥 / 本机配置（禁止提交）---
+keystore.jks
+keystore.properties
+*.jks
+*.keystore
+android/local.properties
+setenv.bat
+
+# --- 运行时生成的 Capacitor 目录（android/.gitignore 也覆盖了）---
+android/.gradle/
+android/app/build/
+android/build/
+android/capacitor-cordova-android-plugins/
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+
+# --- 示例 / 个人数据 ---
+*.yzplan.json
+*.docx
+audio.txt
+
+# --- 系统与临时文件 ---
+.DS_Store
+Thumbs.db
+*.log
+__pycache__/
+_*.js
+*.tmp

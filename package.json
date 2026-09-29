@@ -1,0 +1,25 @@
+{
+  "name": "html2apk-test",
+  "version": "0.1.0",
+  "private": true,
+  "description": "用网页打包成的轻量安卓App",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "cap:add": "cap add android",
+    "cap:sync": "cap sync android",
+    "apk": "npm run build && cap sync android && cd android && gradlew.bat assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/app": "^6.0.3",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/filesystem": "^6.0.4",
+    "@capacitor/share": "^6.0.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^5.4.0"
+  }
+}
