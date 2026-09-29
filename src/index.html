@@ -52,9 +52,18 @@ body{
 .btn:disabled{opacity:.5}
 
 /* ===== 内容区 ===== */
-main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;overscroll-behavior:contain;touch-action:none}
-.page{display:none}
-.page.active{display:block}
+main{flex:1;overflow:hidden;padding:12px;display:flex;flex-direction:column;min-height:0}
+.page{display:none;flex:1;min-height:0}
+.page.active{display:flex;flex-direction:column}
+/* 计划页：整页自管滚动（拖拽需要） */
+#page-tiles.active{
+  display:block;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;touch-action:none;
+}
+/* 日历页：整页不滚，只让打卡明细列表滚 */
+#page-cal.active{overflow:hidden;touch-action:auto;display:flex;flex-direction:column}
+/* 我的页：原生滚动 */
+#page-me.active{overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;display:block}
 
 /* ===== 磁贴 ===== */
 .tile{
@@ -171,9 +180,17 @@ html.drag-lock,html.drag-lock body,html.drag-lock main{overflow:hidden!important
 .cal-day.selected{outline:2px solid #4f6ef7;outline-offset:-2px}
 .cal-detail{
   margin-top:14px;background:var(--card);border:1px solid var(--border);
-  border-radius:12px;padding:12px;min-height:120px;
+  border-radius:12px;padding:12px;min-height:120px;max-height:min(52vh,380px);
+  display:flex;flex-direction:column;overflow:hidden;
 }
-.cal-detail-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-log-list{
+  flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;touch-action:pan-y;
+  touch-action:pan-y !important;
+}
+.cal-log-list::-webkit-scrollbar{width:4px}
+.cal-log-list::-webkit-scrollbar-thumb{background:#d0d5dd;border-radius:4px}
+.cal-detail-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex:none}
 .cal-detail-head h3{font-size:15px;font-weight:700}
 .cal-detail-head .cnt{font-size:12px;color:var(--muted)}
 .cal-log-item{
@@ -926,9 +943,9 @@ function renderDayDetail(){
     box.innerHTML=head+`<div class="cal-empty">无</div>`;
     return;
   }
-  // 按时间顺序（ts 升序），重复内容也各占一条
+  // 按时间顺序（ts 升序），重复内容也各占一条；列表在框内滚动
   const sorted=logs.slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
-  box.innerHTML=head+sorted.map(item=>{
+  box.innerHTML=head+`<div class="cal-log-list" id="calLogList">`+sorted.map(item=>{
     const t=new Date(item.ts||0);
     const hh=String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
     return `<div class="cal-log-item" data-log="${esc(item.id)}" data-day="${esc(k)}">
@@ -936,7 +953,7 @@ function renderDayDetail(){
       <span class="ts">${hh}</span>
       <button class="del-x" data-del-log="${esc(item.id)}" data-del-day="${esc(k)}">✕</button>
     </div>`;
-  }).join('');
+  }).join('')+`</div>`;
 }
 
 $('#calPrev').addEventListener('click', ()=>{ CAL.m--; if(CAL.m<0){CAL.m=11;CAL.y--;} renderCal(); });
@@ -970,6 +987,25 @@ $('#calDetail').addEventListener('click', e=>{
 });
 
 /* ================= 底部导航 ================= */
+function setPageScrollMode(name){
+  const tiles=document.getElementById('page-tiles');
+  const cal=document.getElementById('page-cal');
+  const me=document.getElementById('page-me');
+  // 三页各自滚动互不影响；切到日历时不把计划页 scrollTop 带过来
+  if(tiles){
+    tiles.style.touchAction='none';
+    if(name!=='tiles') tiles.style.overflowY='auto';
+    else tiles.style.overflowY='auto';
+  }
+  if(cal){
+    cal.style.overflowY='hidden';
+    cal.style.touchAction='auto';
+  }
+  if(me){
+    me.style.overflowY='auto';
+    me.style.touchAction='pan-y';
+  }
+}
 function switchTab(name){
   state.page=name;
   $$('.tab').forEach(el=>el.classList.toggle('active', el.dataset.tab===name));
@@ -977,6 +1013,7 @@ function switchTab(name){
   $('#page-cal').classList.toggle('active', name==='cal');
   $('#page-me').classList.toggle('active', name==='me');
   updateTopbar();
+  setPageScrollMode(name);
   if(name==='cal'){
     // 进入日历默认框选当天（并回到本月）
     const d=new Date();
@@ -1136,16 +1173,17 @@ let suppressClickUntil=0;
 
 function lockScroll(on){
   document.documentElement.classList.toggle('drag-lock', !!on);
-  const main=document.querySelector('main');
-  if(main){
-    if(on){ main.style.overflowY='hidden'; main.style.touchAction='none'; }
-    else{ main.style.overflowY=''; main.style.touchAction='none'; }
+  const list=document.getElementById('page-tiles');
+  if(list){
+    if(on){ list.style.overflowY='hidden'; list.style.touchAction='none'; }
+    else{ list.style.overflowY='auto'; list.style.touchAction='none'; }
   }
 }
 
 function setupDrag(){
   const container=$('#page-tiles');
-  const scroller=document.querySelector('main');
+  // 滚动容器是计划页自己，避免和日历/我的页抢同一 scrollTop
+  const scroller=document.getElementById('page-tiles');
   let tile=null, pressTimer=null;
   let startX=0, startY=0, lastX=0, lastY=0;
   let started=false, moved=false, activeId=0;
@@ -1163,6 +1201,8 @@ function setupDrag(){
   };
 
   const onMove=(e)=>{
+    // 明细列表/我的页等原生滚动区域：完全不拦截
+    if(e.target && e.target.closest && e.target.closest('.cal-log-list,#page-me')) return;
     if(started && dragData){
       if(e.cancelable) e.preventDefault();
       e.stopPropagation();
@@ -1371,6 +1411,50 @@ function endDrag(){
 }
 
 setupDrag();
+setupCalListScroll();
+
+/* 日历打卡明细：框内 JS 滚动（不依赖父级 touch-action） */
+function setupCalListScroll(){
+  const box=document.getElementById('calDetail');
+  if(!box) return;
+  let active=false, startY=0, startTop=0, lastY=0, lastT=0, vel=0, list=null;
+  const pickList=(e)=>{
+    const t=e.target;
+    return t && t.closest ? t.closest('.cal-log-list') : null;
+  };
+  box.addEventListener('touchstart', e=>{
+    if(e.touches.length!==1) return;
+    list=pickList(e);
+    if(!list) return;
+    active=true; startY=lastY=e.touches[0].clientY;
+    startTop=list.scrollTop; lastT=performance.now(); vel=0;
+  }, {passive:true});
+  box.addEventListener('touchmove', e=>{
+    if(!active || !list || e.touches.length!==1) return;
+    if(e.cancelable) e.preventDefault();
+    const y=e.touches[0].clientY;
+    list.scrollTop=startTop-(y-startY);
+    const now=performance.now();
+    vel=(y-lastY)/Math.max(now-lastT,1);
+    lastY=y; lastT=now;
+    e.stopPropagation();
+  }, {passive:false});
+  const end=()=>{
+    if(active && list && Math.abs(vel)>0.05){
+      const el=list; let v=vel*16;
+      const step=()=>{
+        if(Math.abs(v)<0.2) return;
+        el.scrollTop -= v;
+        v*=0.95;
+        requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+    active=false; list=null;
+  };
+  box.addEventListener('touchend', end);
+  box.addEventListener('touchcancel', end);
+}
 /* ===== 磁贴点击（点击进入子层/编辑），拖拽结束后屏蔽误触 ===== */
 $('#page-tiles').addEventListener('click', e=>{
   if(Date.now()<suppressClickUntil){ e.stopImmediatePropagation(); return; }
