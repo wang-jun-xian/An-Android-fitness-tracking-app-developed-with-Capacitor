@@ -28,11 +28,19 @@ body{
 
 /* ===== 顶部标题栏 ===== */
 .topbar{
+  position:relative;
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 14px;background:var(--card);border-bottom:1px solid var(--border);
-  flex:none;
+  flex:none;min-height:48px;
 }
-.topbar .title{font-weight:700;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+/* 标题在顶栏水平居中（日历/个人栏无右侧按钮时也居中） */
+.topbar .title{
+  position:absolute;left:50%;transform:translateX(-50%);
+  font-weight:700;font-size:17px;text-align:center;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  max-width:calc(100% - 140px);pointer-events:auto;
+}
+.topbar .title.editable{cursor:pointer;text-decoration:underline;text-decoration-style:dashed;text-underline-offset:4px}
 .btn{
   border:none;border-radius:9px;padding:7px 12px;font-size:13px;cursor:pointer;
   background:#eef0f5;color:var(--txt);transition:background .15s;
@@ -148,10 +156,41 @@ html.drag-lock,html.drag-lock body,html.drag-lock main{overflow:hidden!important
 .bin-item .bin-meta{font-size:11px;color:var(--muted)}
 
 /* ===== 日历 ===== */
-.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-stats{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:12px;margin-bottom:12px;font-size:14px;color:var(--muted);
+}
+.cal-stats .num{font-size:22px;font-weight:700;color:#4f6ef7;min-width:1.5em;text-align:center}
+.cal-head{display:grid;grid-template-columns:72px 1fr 96px;align-items:center;gap:6px;margin-bottom:10px}
 .cal-head .btn{width:34px;height:34px;padding:0}
-.cal-title{font-weight:700;font-size:16px}
+.cal-title{font-weight:700;font-size:16px;text-align:center}
+.cal-right{display:flex;gap:6px;justify-content:flex-end;align-items:center}
+.cal-right .btn{width:auto;padding:0 10px;height:34px;font-size:13px}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day.selected{outline:2px solid #4f6ef7;outline-offset:-2px}
+.cal-detail{
+  margin-top:14px;background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:12px;min-height:120px;
+}
+.cal-detail-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-detail-head h3{font-size:15px;font-weight:700}
+.cal-detail-head .cnt{font-size:12px;color:var(--muted)}
+.cal-log-item{
+  display:flex;align-items:center;gap:8px;padding:10px 8px;
+  border-bottom:1px solid var(--border);font-size:14px;
+}
+.cal-log-item:last-child{border-bottom:none}
+.cal-log-item .label{flex:1;word-break:break-word}
+.cal-log-item .ts{font-size:11px;color:var(--muted);flex:none}
+.cal-log-item .del-x{
+  width:28px;height:28px;border:none;border-radius:8px;background:#fde8e8;
+  color:var(--danger);font-size:14px;cursor:pointer;flex:none;
+}
+.cal-empty{
+  text-align:center;padding:28px 0 18px;color:#9aa3b2;
+  font-family:Georgia,'Songti SC','SimSun',serif;font-size:22px;letter-spacing:8px;
+}
 .cal-day{aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:10px;font-size:14px;cursor:pointer}
 .cal-day.dim{color:#adb3bd}
 .cal-day.today{border:2px solid #4f6ef7}
@@ -186,7 +225,7 @@ html.drag-lock,html.drag-lock body,html.drag-lock main{overflow:hidden!important
   <header class="topbar" id="topbar">
     <button class="btn" id="btnBack" title="返回上一级">‹ 返回</button>
     <span class="title" id="topTitle">多套健身方案</span>
-    <div style="display:flex;gap:6px">
+    <div id="topActions" style="display:flex;gap:6px">
       <button class="btn primary" id="btnAdd">＋ 添加</button>
     </div>
   </header>
@@ -196,12 +235,17 @@ html.drag-lock,html.drag-lock body,html.drag-lock main{overflow:hidden!important
     <div class="page active" id="page-tiles"></div>
     <!-- 页2：日历 -->
     <div class="page" id="page-cal">
+      <div class="cal-stats">已打卡天数 <span class="num" id="calDoneDays">0</span> 天</div>
       <div class="cal-head">
-        <button class="btn" id="calPrev">‹</button>
-        <span class="cal-title" id="calTitle"></span>
-        <button class="btn" id="calNext">›</button>
+        <div class="cal-left"><button class="btn" id="calPrev">‹</button></div>
+        <div class="cal-title" id="calTitle"></div>
+        <div class="cal-right">
+          <button class="btn" id="calToday">定位</button>
+          <button class="btn" id="calNext">›</button>
+        </div>
       </div>
       <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-detail" id="calDetail"></div>
     </div>
     <!-- 页3：个人页（回收站/导入导出） -->
     <div class="page" id="page-me"><div id="meBody"></div></div>
@@ -304,6 +348,7 @@ let workout={}; // 会话标记 {catId:true}
 function load(){
   try{ D=JSON.parse(localStorage.getItem(DB_KEY))||defaultData(); }catch(e){ D=defaultData(); }
   if(!D||!Array.isArray(D.plans)) D=defaultData();
+  if(!D.title) D.title='多套健身方案';
   bin=(D._bin)||[]; delete D._bin;
 }
 function save(){
@@ -362,7 +407,10 @@ function getList(){
   if(!state.path.length) return D.plans;
   let node=D.plans.find(p=>p.id===state.path[0]);
   for(let i=1;i<state.path.length;i++) node=(node?node.subs:[]).find(s=>s&&s.id===state.path[i]);
-  return node? node.subs||[] : [];
+  // 保证返回可写数组引用，否则 push 新磁贴会丢失
+  if(!node) return D.plans;
+  if(!Array.isArray(node.subs)) node.subs=[];
+  return node.subs;
 }
 function getPathNames(){
   if(!state.path.length) return [];
@@ -394,11 +442,37 @@ const isExLevel=()=>state.path.length>=2;
 /* ================= 渲染：磁贴页 ================= */
 function renderTiles(){
   const list=getList();
-  // 顶部栏
-  const backVisible=state.path.length>0;
-  $('#topTitle').textContent=backVisible? getPathNames().join(' › '):'多套健身方案';
-  $('#btnAdd').textContent=(list.length? '＋ 添加':'＋ 添加');
+  updateTopbar();
+  $('#btnAdd').textContent='＋ 添加';
   $('#page-tiles').innerHTML = list.map((t,i)=>tileHTML(t,i,list)).join('') || emptyHTML();
+}
+
+/* 顶栏：三栏标题不同；仅计划栏可编辑标题、显示添加 */
+function planTitle(){ return (D && D.title && String(D.title).trim()) || '多套健身方案'; }
+function updateTopbar(){
+  const page=state.page||'tiles';
+  const titleEl=$('#topTitle');
+  const addBtn=$('#btnAdd');
+  const actions=$('#topActions');
+  titleEl.classList.remove('editable');
+  if(page==='tiles'){
+    addBtn.style.display='';
+    if(actions) actions.style.display='flex';
+    if(state.path.length){
+      titleEl.textContent=getPathNames().join(' › ');
+    }else{
+      titleEl.textContent=planTitle();
+      titleEl.classList.add('editable');
+    }
+  }else if(page==='cal'){
+    addBtn.style.display='none';
+    if(actions) actions.style.display='none';
+    titleEl.textContent='日历';
+  }else{
+    addBtn.style.display='none';
+    if(actions) actions.style.display='none';
+    titleEl.textContent='个人';
+  }
 }
 function emptyHTML(){
   const tip = isPlanLevel()? '还没有健身方案，点击右上角“＋ 添加”创建': isCatLevel()? '这个方案还没有栏目，点击“＋ 添加”创建栏目':'这个栏目还没有动作，点击“＋ 添加”添加动作';
@@ -435,6 +509,11 @@ function toggleCheck(id){
   // 打卡/取消打卡：切换一次即可；叶子手动状态，父级由子项推导
   const newVal=!t.done;
   setSubtreeDone(t,newVal);
+  if(newVal){
+    // 记一条「方案>栏目」级打卡（同日可重复）
+    addActLog(todayKey(), level2Label(id), uid());
+    logDay(todayKey());
+  }
   recomputeFromLevel(D.plans);
   save(); renderTiles(); renderCal();
 }
@@ -446,9 +525,18 @@ function goBack(){
 }
 function goHome(){ state.path=[]; switchTab('tiles'); }
 $('#btnBack').addEventListener('click', goBack);
+// 计划栏顶栏标题可编辑（仅方案根层级）
+$('#topTitle').addEventListener('click', ()=>{
+  if(state.page!=='tiles' || state.path.length) return;
+  const cur=planTitle();
+  const next=window.prompt('编辑标题', cur);
+  if(next==null) return;
+  const name=next.trim()||'多套健身方案';
+  D.title=name; save(); updateTopbar();
+});
 $('#btnAdd').addEventListener('click', ()=>{
-  // 点击“添加”仅打开编辑面板，保存后才真正生成磁贴
-  editing={id:uid(), name:'', color:rndColor(), subs:[], _isDraft:true}; // 草稿
+  // 在当前层级创建：方案/栏目可带子项；动作为叶子
+  editing={id:uid(), name:'', color:rndColor(), subs:[], _isDraft:true};
   openEdit(editing, true, true);
 });
 
@@ -601,6 +689,8 @@ function normalizePlans(raw){
 
 // 打开传输面板（导出选择 / 导入入口）
 function openTransfer(){
+  transferMode='plan';
+  $('#trTitle').textContent='导出 / 导入方案';
   const plans=D.plans||[];
   if(!plans.length){
     $('#trBody').innerHTML='<p style="color:var(--muted);text-align:center;padding:16px 0;font-size:13px">暂无方案可导出。可先在“＋ 添加”创建方案。</p>';
@@ -618,7 +708,10 @@ function openTransfer(){
 }
 // 传输面板内事件委托（关闭、导出、导入都在 ovTransfer 上）
 $('#ovTransfer').addEventListener('click', e=>{
-  if(e.target.closest('#trClose') || e.target.id==='ovTransfer'){ hideModal('ovTransfer'); return; }
+  if(e.target.closest('#trClose') || e.target.id==='ovTransfer'){ hideModal('ovTransfer'); transferMode='plan'; return; }
+  // 运动数据面板
+  if(e.target.closest('#actExport')){ exportActivity(); return; }
+  if(e.target.closest('#actImport')){ hideModal('ovTransfer'); doImportActivity(); transferMode='plan'; return; }
   const ex=e.target.closest('[data-exp]');
   if(ex){ const p=D.plans.find(x=>x.id===ex.dataset.exp); if(p) exportPlan(p); return; }
   const imp=e.target.closest('#trImport');
@@ -668,22 +761,31 @@ function readFileToImport(file){
 /* ================= 编辑面板 ================= */
 let editing=null;
 function makeTile(){ return {id:uid(), name:'', color:rndColor(), subs:[]}; }
+function levelNoun(){
+  const d=(state.path||[]).length;
+  return d===0?'方案': (d===1?'栏目':'动作');
+}
 function openEdit(t, isNew, isDraft){
   editing=t; $('#edName').value=t.name||'';
-  $('#ovEdit h3').textContent=(isNew?'添加': (isLeaf(t)?'编辑动作':'编辑'));
-  // 名称/描述
+  // 方案/栏目即使暂时没有子项，也按“容器”编辑，才能建出当前级别磁贴
+  const asContainer = !isLeaf(t) || ((state.path||[]).length < 2);
+  const lv=levelNoun();
+  $('#ovEdit h3').textContent = isNew ? ('添加'+lv) : (asContainer? '编辑'+lv : '编辑动作');
   $('#edName').placeholder='名称';
-  // 描述行（仅方案层/非叶子）
+  // 描述行：容器层级显示
   const descRow=$('#edDescRow');
-  if(descRow){ descRow.classList.toggle('hidden', isLeaf(t)); if($('#edDesc')) $('#edDesc').value=t.desc||''; }
+  if(descRow){ descRow.classList.toggle('hidden', !asContainer); if($('#edDesc')) $('#edDesc').value=t.desc||''; }
   // 调色板
   $('#edPalette').innerHTML=PALETTE.map(c=>`<span class="swatch${t.color===c?' sel':''}" data-c="${c}" style="background:${c}"></span>`).join('');
-  // 子项列表（非叶子）
+  // 子项列表
   const subsBox=$('#edSubs');
-  if(isLeaf(t)){ subsBox.innerHTML='<p style="color:var(--muted);font-size:12px">子动作在上级栏目中添加</p>'; $('#edAddSub').style.display='none'; }
-  else{
-    subsBox.innerHTML=(t.subs||[]).map((s,i)=>`<div class="edit-sub"><span>${i+1}. ${esc(s.name)}</span><button class="btn danger" data-rm="${s.id}" style="padding:3px 8px;font-size:12px">✕</button></div>`).join('') || '<p style="color:var(--muted);font-size:12px">暂无子项</p>';
+  if(!asContainer){
+    subsBox.innerHTML='<p style="color:var(--muted);font-size:12px">动作层不需要子项</p>';
+    $('#edAddSub').style.display='none';
+  }else{
+    subsBox.innerHTML=(t.subs||[]).map((s,i)=>`<div class="edit-sub"><span>${i+1}. ${esc(s.name)}</span><button class="btn danger" data-rm="${s.id}" style="padding:3px 8px;font-size:12px">✕</button></div>`).join('') || '<p style="color:var(--muted);font-size:12px">暂无子项，可点下方添加</p>';
     $('#edAddSub').style.display='inline-block';
+    $('#edAddSub').textContent='+ 添加子项';
   }
   showModal('ovEdit');
 }
@@ -696,7 +798,13 @@ $('#edSubs').addEventListener('click', e=>{
     openEdit(editing);
   },'删除');
 });
-$('#edAddSub').addEventListener('click', ()=>{ if(!editing) return; (editing.subs=editing.subs||[]).push({id:uid(),name:'新动作',color:rndColor(),subs:[]}); openEdit(editing); });
+$('#edAddSub').addEventListener('click', ()=>{
+  if(!editing) return;
+  // 父级是方案 → 子项是栏目；父级是栏目 → 子项是动作
+  const name=((state.path||[]).length===0)? '新栏目': '新动作';
+  (editing.subs=editing.subs||[]).push({id:uid(), name, color:rndColor(), subs:[]});
+  openEdit(editing);
+});
 $('#edSave').addEventListener('click', ()=>{
   if(!editing) return;
   editing.name=($('#edName').value||'').trim()||'未命名';
@@ -721,11 +829,13 @@ function toggleWorkout(catId){
     // 开始：全子项置未打卡 + 栏目高亮
     setSubtreeDone(cat,false); cat.done=false;
     workout[catId]=true;
+    addActLog(todayKey(), level2Label(catId), uid());
     logDay(todayKey());
   }else{
     // 结束：栏目及所有子项打卡
     setSubtreeDone(cat,true); cat.done=true;
     delete workout[catId];
+    addActLog(todayKey(), level2Label(catId), uid());
     logDay(todayKey());
   }
   // 会话结束后整树重新推导，确保父级(方案)随栏目全打卡而自动打卡
@@ -733,31 +843,131 @@ function toggleWorkout(catId){
   save(); renderTiles(); renderCal();
 }
 
-/* ================= 日历 ================= */
-let ACT={days:{}};
-function actData(){ let raw=localStorage.getItem('yz_activity'); try{const o=JSON.parse(raw);return (o&&o.days)?o:{days:{}};}catch{return {days:{}};} }
+/* ================= 日历 / 运动打卡记录 ================= */
+let ACT={days:{},logs:{}};
+function actData(){
+  let raw=localStorage.getItem('yz_activity');
+  try{
+    const o=JSON.parse(raw);
+    if(o&&typeof o==='object'){
+      return { days: o.days||{}, logs: o.logs||{} };
+    }
+  }catch(e){}
+  return { days:{}, logs:{} };
+}
 const todayKey=()=>{ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 function logDay(k){ if(!ACT.days[k]) ACT.days[k]=0; ACT.days[k]++; persistAct(); }
 function persistAct(){ try{ localStorage.setItem('yz_activity', JSON.stringify(ACT)); }catch(e){} }
-let CAL={y:new Date().getFullYear(), m:new Date().getMonth()};
+
+/* 以「方案>栏目」记录一条运动打卡（允许同日重复多条） */
+function level2Label(id){
+  function walk(node, chain){
+    if(!node) return null;
+    const next=chain.concat([node.name||'未命名']);
+    if(node.id===id) return next;
+    for(const s of (node.subs||[])){ const r=walk(s,next); if(r) return r; }
+    return null;
+  }
+  let names=null;
+  for(const p of (D.plans||[])){ names=walk(p,[]); if(names) break; }
+  if(!names||!names.length) return '未知';
+  if(names.length===1) return names[0];
+  return names[0]+'>'+names[1];
+}
+function addActLog(day, label, id){
+  if(!ACT.logs) ACT.logs={};
+  if(!ACT.logs[day]) ACT.logs[day]=[];
+  // 同一天同一打卡内容只保留一条
+  if(ACT.logs[day].some(x=>x&&x.label===label)) return;
+  ACT.logs[day].push({ id:id||uid(), label:label, ts:Date.now() });
+  if(!ACT.days[day]) ACT.days[day]=0;
+  ACT.days[day]=ACT.logs[day].length;
+  persistAct();
+}
+function actDayHas(k){
+  return ((ACT.logs&&ACT.logs[k]&&ACT.logs[k].length)>0) || ((ACT.days&&ACT.days[k]||0)>0);
+}
+function doneDaysCount(){
+  const set=new Set();
+  Object.keys(ACT.days||{}).forEach(k=>{ if((ACT.days[k]||0)>0) set.add(k); });
+  Object.keys(ACT.logs||{}).forEach(k=>{ if((ACT.logs[k]||[]).length>0) set.add(k); });
+  return set.size;
+}
+
+let CAL={y:new Date().getFullYear(), m:new Date().getMonth(), sel:todayKey()};
 function renderCal(){
   const y=CAL.y, m=CAL.m;
   $('#calTitle').textContent=`${y}年${m+1}月`;
+  const el=document.getElementById('calDoneDays');
+  if(el) el.textContent=String(doneDaysCount());
   const first=new Date(y,m,1).getDay();
   const days=new Date(y,m+1,0).getDate();
-  const td=new Date(); const todayStr=td.getFullYear()+'-'+String(td.getMonth()+1).padStart(2,'0')+'-'+String(td.getDate()).padStart(2,'0');
+  const todayStr=todayKey();
   let html='<div class="cal-day dim" style="color:var(--muted);font-size:12px">日</div><div class="cal-day dim" style="color:var(--muted);font-size:12px">一</div><div class="cal-day dim" style="color:var(--muted);font-size:12px">二</div><div class="cal-day dim" style="color:var(--muted);font-size:12px">三</div><div class="cal-day dim" style="color:var(--muted);font-size:12px">四</div><div class="cal-day dim" style="color:var(--muted);font-size:12px">五</div><div class="cal-day dim" style="color:var(--muted);font-size:12px">六</div>';
   for(let i=0;i<first;i++) html+='<div></div>';
   for(let d=1;d<=days;d++){
     const k=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const done=!!ACT.days[k];
+    const done=actDayHas(k);
     const today=k===todayStr;
-    html+=`<div class="cal-day${done?' done':''}${today?' today':''}">${d}${done?`<span class="cal-tag">练</span>`:''}</div>`;
+    const sel=k===CAL.sel;
+    html+=`<div class="cal-day${done?' done':''}${today?' today':''}${sel?' selected':''}" data-day="${k}">${d}${done?`<span class="cal-tag">练</span>`:''}</div>`;
   }
   $('#calGrid').innerHTML=html;
+  renderDayDetail();
 }
+
+function renderDayDetail(){
+  const box=document.getElementById('calDetail');
+  if(!box) return;
+  const k=CAL.sel;
+  const logs=(ACT.logs&&ACT.logs[k])? ACT.logs[k]: [];
+  const head=`<div class="cal-detail-head"><h3>${esc(k)} 打卡明细</h3><span class="cnt">${logs.length} 条</span></div>`;
+  if(!logs.length){
+    box.innerHTML=head+`<div class="cal-empty">无</div>`;
+    return;
+  }
+  // 按时间顺序（ts 升序），重复内容也各占一条
+  const sorted=logs.slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
+  box.innerHTML=head+sorted.map(item=>{
+    const t=new Date(item.ts||0);
+    const hh=String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
+    return `<div class="cal-log-item" data-log="${esc(item.id)}" data-day="${esc(k)}">
+      <span class="label">${esc(item.label||'')}</span>
+      <span class="ts">${hh}</span>
+      <button class="del-x" data-del-log="${esc(item.id)}" data-del-day="${esc(k)}">✕</button>
+    </div>`;
+  }).join('');
+}
+
 $('#calPrev').addEventListener('click', ()=>{ CAL.m--; if(CAL.m<0){CAL.m=11;CAL.y--;} renderCal(); });
 $('#calNext').addEventListener('click', ()=>{ CAL.m++; if(CAL.m>11){CAL.m=0;CAL.y++;} renderCal(); });
+// 定位：回到本月，并选中今天
+$('#calToday').addEventListener('click', ()=>{
+  const d=new Date();
+  CAL.y=d.getFullYear(); CAL.m=d.getMonth(); CAL.sel=todayKey();
+  renderCal();
+});
+// 点选某天 / 删除明细
+$('#calGrid').addEventListener('click', e=>{
+  const day=e.target.closest('[data-day]');
+  if(!day) return;
+  CAL.sel=day.dataset.day;
+  renderCal();
+});
+$('#calDetail').addEventListener('click', e=>{
+  const del=e.target.closest('[data-del-log]');
+  if(!del) return;
+  const day=del.dataset.delDay, id=del.dataset.delLog;
+  confirmModal('删除这条打卡？','删除后该日明细将少一条记录，不可撤销。', ()=>{
+    if(ACT.logs && ACT.logs[day]){
+      ACT.logs[day]=ACT.logs[day].filter(x=>x.id!==id);
+      ACT.days[day]=ACT.logs[day].length;
+      if(!ACT.logs[day].length) delete ACT.days[day];
+      persistAct();
+    }
+    renderCal();
+  },'删除');
+});
 
 /* ================= 底部导航 ================= */
 function switchTab(name){
@@ -766,7 +976,13 @@ function switchTab(name){
   $('#page-tiles').classList.toggle('active', name==='tiles');
   $('#page-cal').classList.toggle('active', name==='cal');
   $('#page-me').classList.toggle('active', name==='me');
-  if(name==='cal') renderCal();
+  updateTopbar();
+  if(name==='cal'){
+    // 进入日历默认框选当天（并回到本月）
+    const d=new Date();
+    CAL.y=d.getFullYear(); CAL.m=d.getMonth(); CAL.sel=todayKey();
+    renderCal();
+  }
   if(name==='me') renderMe();
 }
 $$('.tab').forEach(el=>el.addEventListener('click', ()=>switchTab(el.dataset.tab)));
@@ -775,12 +991,120 @@ $$('.tab').forEach(el=>el.addEventListener('click', ()=>switchTab(el.dataset.tab
 function renderMe(){
   $('#meBody').innerHTML=`
     <div class="me-sec-title">数据管理</div>
-    <div class="me-card" id="meCardTransfer">⇅ 导出 / 导入方案 <span class="me-arrow">›</span></div>
+    <div class="me-card" id="meCardTransfer">📋 导出 / 导入方案 <span class="me-arrow">›</span></div>
+    <div class="me-card" id="meCardActivity">📊 导出 / 导入运动数据 <span class="me-arrow">›</span></div>
     <div class="me-card" id="meCardBin">🗑 回收站 <span class="me-arrow">›</span></div>
     <div class="me-sec-title" style="margin-top:18px">关于</div>
-    <div class="me-card" style="justify-content:center;color:var(--muted);font-size:13px">云舟健身 · 本地数据</div>`;
+    <div class="me-card" style="justify-content:center;color:var(--muted);font-size:13px">云舟健身 v1.5 · 本地数据</div>`;
   $('#meCardTransfer').addEventListener('click', openTransfer);
+  $('#meCardActivity').addEventListener('click', openActivityTransfer);
   $('#meCardBin').addEventListener('click', openBin);
+}
+
+/* 运动数据导出 / 导入（与方案导出导入区分） */
+let transferMode='plan';
+function openActivityTransfer(){
+  const n=doneDaysCount();
+  const total=Object.keys(ACT.logs||{}).reduce((s,k)=>s+((ACT.logs[k]||[]).length),0);
+  $('#trTitle').textContent='导出 / 导入运动数据';
+  $('#trBody').innerHTML=`
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+      当前共 <b style="color:var(--txt)">${n}</b> 个打卡日、<b style="color:var(--txt)">${total}</b> 条明细记录。<br>
+      导出文件用于备份或迁移，不会包含健身方案内容。
+    </p>
+    <button class="btn primary" id="actExport" style="width:100%;margin-bottom:10px">导出运动数据</button>
+    <button class="btn tw" id="actImport" style="width:100%">📥 从文件导入运动数据</button>`;
+  transferMode='activity';
+  showModal('ovTransfer');
+}
+function exportActivity(){
+  const data={ app:'yzfitness-activity', version:1, activity: JSON.parse(JSON.stringify({ days:ACT.days||{}, logs:ACT.logs||{} })) };
+  const text=JSON.stringify(data,null,2);
+  const fname='运动数据-'+stamp()+'.yzact.json';
+  const saveNative=async ()=>{
+    const Yz=window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.YzExport;
+    if(!Yz || !Yz.saveToDownloads) return false;
+    try{
+      const res=await Yz.saveToDownloads({ fileName:fname, content:text });
+      const where=(res && res.path)? res.path : '手机「下载」文件夹';
+      msg('已导出运动数据\n位置：'+where);
+      return true;
+    }catch(e){ return false; }
+  };
+  const shareFallback=async ()=>{
+    try{
+      const FS=window.Capacitor.Plugins.Filesystem;
+      await FS.writeFile({ path:fname, data:text, directory:FS.Directory.Cache, encoding:FS.Encoding.UTF8 });
+      let uri=fname;
+      try{ const got=await FS.getUri({ path:fname, directory:FS.Directory.Cache }); uri=(got&&got.uri)||fname; }catch(e){}
+      await window.Capacitor.Plugins.Share.share({
+        title:'导出运动数据', text:'请在分享面板中保存到文件/下载', url:uri, dialogTitle:'分享 / 保存运动数据'
+      });
+      msg('已生成运动数据文件，请在分享面板中保存。');
+    }catch(err){ msg('导出失败：'+(err&&err.message?err.message:'无法写入或分享')); }
+  };
+  const run=async ()=>{
+    const ok=await saveNative();
+    if(ok) return;
+    if(isNativeCap()) await shareFallback();
+    else{
+      const blob=new Blob([text],{type:'application/json;charset=utf-8'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob); a.download=fname; a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+      msg('已导出运动数据：'+fname);
+    }
+  };
+  run();
+}
+function doImportActivity(){
+  const input=document.createElement('input');
+  input.type='file'; input.accept='.yzact.json,.json,application/json';
+  input.onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const reader=new FileReader();
+    reader.onload=()=>{
+      try{
+        const obj=JSON.parse(reader.result);
+        const act=(obj&&obj.activity)||obj;
+        if(!act || (!act.logs && !act.days)) throw new Error('不是有效的运动数据文件');
+        const logs=act.logs||{};
+        const days=act.days||{};
+        const dayCount=Object.keys(logs).length;
+        confirmModal('导入运动数据？',
+          `将导入 ${dayCount} 个打卡日的数据。同日记录会追加，现有记录保留。`,
+          ()=>{
+            if(!ACT.logs) ACT.logs={};
+            if(!ACT.days) ACT.days={};
+            Object.keys(logs).forEach(k=>{
+              const arr=logs[k]||[];
+              if(!ACT.logs[k]) ACT.logs[k]=[];
+              arr.forEach(item=>{
+                if(item&&typeof item==='object'){
+                  const label=item.label||'未知';
+                  // 同日同内容只保留一条
+                  if(!ACT.logs[k].some(x=>x&&x.label===label)){
+                    ACT.logs[k].push({ id:item.id||uid(), label, ts:item.ts||Date.now() });
+                  }
+                }
+              });
+              ACT.days[k]=ACT.logs[k].length;
+            });
+            Object.keys(days).forEach(k=>{
+              if(!ACT.days[k] && (days[k]||0)>0) ACT.days[k]=days[k];
+            });
+            persistAct();
+            hideModal('ovTransfer');
+            renderCal();
+            msg('已导入运动数据');
+          },'导入');
+      }catch(err){ msg('导入失败：'+err.message); }
+    };
+    reader.readAsText(f,'utf-8');
+  };
+  document.body.appendChild(input);
+  setTimeout(()=>input.remove(),10000);
+  input.click();
 }
 
 /* ================= 弹窗组件 ================= */
@@ -1064,8 +1388,11 @@ $('#page-tiles').addEventListener('click', e=>{
   if(tile && !dragActive){
     e.stopImmediatePropagation();
     const t=findNodeById(tile.dataset.id);
-    if(t && t.subs && t.subs.length){ state.path.push(t.id); renderTiles(); }
-    else if(t){ openEdit(t); }
+    if(!t) return;
+    // 方案层/栏目层是容器：空的也可进入继续添加；动作层点编辑
+    const canEnter = state.path.length < 2 || (Array.isArray(t.subs) && t.subs.length>0);
+    if(canEnter){ state.path.push(t.id); renderTiles(); }
+    else { openEdit(t); }
   }
 });
 
@@ -1091,7 +1418,7 @@ function init(){
       });
     }
   }catch(e){}
-  document.title='云舟健身';
+  document.title='云舟健身 v1.5';
 }
 init();
 </script>

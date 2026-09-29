@@ -1,6 +1,6 @@
 {
   "name": "html2apk-test",
-  "version": "0.1.0",
+  "version": "1.5.0",
   "private": true,
   "description": "用网页打包成的轻量安卓App",
   "scripts": {
