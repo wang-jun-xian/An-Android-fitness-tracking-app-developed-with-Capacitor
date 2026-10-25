@@ -234,6 +234,119 @@ html.drag-lock,html.drag-lock body,html.drag-lock main{overflow:hidden!important
   padding:14px;margin-bottom:10px;font-size:15px;cursor:pointer;
 }
 .me-card .me-arrow{color:#c1c6d0;font-size:18px}
+
+/* ===== 动作参数 / 历史（磁贴第二行） ===== */
+.ex-line{font-size:12px;color:#4f6ef7;background:#eef2ff;border-radius:6px;
+  padding:3px 8px;margin-top:7px;display:inline-block}
+.hist-line{font-size:11px;color:var(--muted);margin-top:5px}
+.hist-line b{color:#b7791f;font-weight:600}
+
+/* 编辑面板：动作参数每行一项（上下排列） */
+.exf{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.exf>label{width:4.5em;font-size:13px;color:var(--muted);flex:none}
+.exf input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center}
+.exf input:focus{outline:none;border-color:#4f6ef7}
+.exf .sr-unit{flex:none}
+.exf-u{font-size:12px;color:var(--muted);flex:none}
+
+/* 数字输入：左右步进按钮（移动端 WebView 不渲染原生上下箭头） */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+.stp{
+  width:36px;height:36px;flex:none;border:none;border-radius:9px;
+  background:#eef0f5;color:#374151;font-size:19px;line-height:1;
+  cursor:pointer;touch-action:manipulation;
+}
+.stp:active{background:#cdd6f7;color:#1d2a5e}
+
+/* ===== 记组弹窗 ===== */
+.sr-target{font-size:12px;color:#4f6ef7;background:#eef2ff;border-radius:8px;
+  padding:6px 10px;margin-bottom:10px}
+.sr-cur{display:flex;flex-direction:column;gap:6px}
+.sr-cur .exf{margin-bottom:0}
+.sr-unit{
+  border:1px solid var(--border);border-radius:8px;padding:8px 8px;font-size:13px;
+  background:#eef0f5;cursor:pointer;color:var(--txt);min-width:40px;flex:none;
+}
+.pill{
+  border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;
+  background:#fff;color:var(--muted);cursor:pointer;flex:none;
+}
+.pill.on{background:#f4b83b;color:#5c4300;border-color:#f4b83b;font-weight:600}
+.sr-list{margin:10px 0;max-height:26vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+.sr-row{
+  display:flex;align-items:center;gap:8px;background:#f7f8fb;border:1px solid var(--border);
+  border-radius:8px;padding:7px 10px;font-size:14px;
+}
+.sr-row .no{color:#9aa3b2;font-size:12px;min-width:14px}
+.sr-row .rm{margin-left:auto;border:none;background:#fde8e8;color:var(--danger);
+  border-radius:6px;width:26px;height:26px;font-size:12px;cursor:pointer}
+.sr-row.wu{opacity:.65}
+.sr-row .wutag{font-size:10px;color:#b7791f;background:#fff4dc;border-radius:4px;padding:1px 4px}
+
+/* ===== 组间休息计时条 ===== */
+#timerBar{
+  position:fixed;left:12px;right:12px;z-index:70;
+  bottom:calc(62px + env(safe-area-inset-bottom));
+  background:#111827;color:#fff;border-radius:13px;padding:2px 12px 8px;
+  box-shadow:0 8px 24px rgba(0,0,0,.3);
+}
+#timerBar.done{background:#16a34a}
+.tb-prog{height:3px;background:rgba(255,255,255,.2);border-radius:2px;margin:6px 0 4px;overflow:hidden}
+.tb-prog i{display:block;height:100%;background:#f4b83b;border-radius:2px;transition:width .2s linear}
+.tb-row{display:flex;align-items:center;gap:8px}
+.tb-row .tb-label{font-size:13px;flex:1}
+.tb-row b{font-size:22px;font-variant-numeric:tabular-nums;min-width:1.6em;text-align:center}
+.tb-row .tb-u{font-size:12px;color:#9ca3af;margin-right:4px}
+.tb-btn{
+  border:none;border-radius:8px;background:rgba(255,255,255,.14);color:#fff;
+  font-size:12px;padding:6px 10px;cursor:pointer;
+}
+.tb-btn:active{background:rgba(255,255,255,.28)}
+
+/* ===== 动作详情弹窗 ===== */
+.dt-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.dt-name{font-size:16px;font-weight:700;flex:1;word-break:break-word}
+.dt-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
+.dt-stat{background:#f7f8fb;border:1px solid var(--border);border-radius:9px;padding:7px 4px;text-align:center}
+.dt-stat .v{font-size:15px;font-weight:700;color:#4f6ef7}
+.dt-stat .k{font-size:10px;color:var(--muted);margin-top:2px}
+.dt-chart{background:#f7f8fb;border:1px solid var(--border);border-radius:10px;padding:8px;margin-bottom:10px}
+.dt-chart svg{display:block;width:100%;height:auto}
+.dt-hist{max-height:30vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+.dt-hist-item{background:#fff;border:1px solid var(--border);border-radius:9px;padding:8px 10px;font-size:13px}
+.dt-hist-item .dt-hist-top{display:flex;align-items:center;gap:8px}
+.dt-hist-item .dt-hist-top b{flex:1}
+.dt-hist-item .dt-hist-sets{color:var(--muted);font-size:12px;margin-top:4px;word-break:break-all}
+
+/* ===== 日历明细：组 chips ===== */
+.cal-log-item{flex-direction:column;align-items:stretch;gap:4px}
+.cal-log-item .log-main{display:flex;align-items:center;gap:8px;width:100%}
+.set-chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding-left:2px}
+.set-chip{
+  font-size:11px;background:#eef2ff;color:#4f6ef7;border-radius:5px;padding:2px 6px;
+  font-variant-numeric:tabular-nums;
+}
+.set-chip.wu{background:#f4f0e6;color:#b7791f}
+.ton-chip{font-size:11px;color:#16a34a;font-weight:600}
+
+/* ===== 统计弹窗 ===== */
+.st-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.st-num{background:#f7f8fb;border:1px solid var(--border);border-radius:10px;padding:10px 4px;text-align:center}
+.st-num .v{font-size:20px;font-weight:700;color:#4f6ef7}
+.st-num .k{font-size:11px;color:var(--muted);margin-top:3px}
+.st-sec{font-size:12px;color:var(--muted);margin:12px 0 6px}
+.st-bars{display:flex;align-items:flex-end;gap:6px;height:90px;padding:4px 2px 0}
+.st-bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:3px}
+.st-bar i{display:block;width:100%;background:#4f6ef7;border-radius:4px 4px 0 0;min-height:2px}
+.st-bar .lb{font-size:9px;color:var(--muted);white-space:nowrap}
+.st-bar .vv{font-size:9px;color:#4f6ef7;white-space:nowrap}
+.st-cat{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px}
+.st-cat .nm{width:5.5em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st-cat .bar-bg{flex:1;height:10px;background:#f1f2f6;border-radius:5px;overflow:hidden}
+.st-cat .bar-bg i{display:block;height:100%;border-radius:5px}
+.st-cat .pct{font-size:11px;color:var(--muted);min-width:3em;text-align:right}
 </style>
 </head>
 <body>
@@ -252,7 +365,7 @@ html.drag-lock,html.drag-lock body,html.drag-lock main{overflow:hidden!important
     <div class="page active" id="page-tiles"></div>
     <!-- 页2：日历 -->
     <div class="page" id="page-cal">
-      <div class="cal-stats">已打卡天数 <span class="num" id="calDoneDays">0</span> 天</div>
+      <div class="cal-stats">已打卡 <span class="num" id="calDoneDays">0</span> 天 · 连续 <span class="num" id="calStreak">0</span> 天</div>
       <div class="cal-head">
         <div class="cal-left"><button class="btn" id="calPrev">‹</button></div>
         <div class="cal-title" id="calTitle"></div>
@@ -298,9 +411,19 @@ html.drag-lock,html.drag-lock body,html.drag-lock main{overflow:hidden!important
         <label>颜色</label>
         <div class="palette" id="edPalette"></div>
       </div>
-      <div class="field hidden" id="edDescRow">
-        <label>描述（可选）</label>
+      <div class="field" id="edDescRow">
+        <label id="edDescLabel">描述（可选）</label>
         <input type="text" id="edDesc" placeholder="例如：周期四天" />
+      </div>
+      <!-- 动作训练参数（仅动作层叶子显示，每行一个参数，左右步进） -->
+      <div class="field hidden" id="edExRow">
+        <label>训练参数（可选，打卡时可快速记组）</label>
+        <div class="exf"><label>组数</label><button type="button" class="stp" data-stp="edSets" data-d="-1">−</button><input type="number" inputmode="numeric" id="edSets" placeholder="如 4" min="1" /><button type="button" class="stp" data-stp="edSets" data-d="1">＋</button></div>
+        <div class="exf"><label>次数/组</label><button type="button" class="stp" data-stp="edReps" data-d="-1">−</button><input type="number" inputmode="numeric" id="edReps" placeholder="如 12" min="1" /><button type="button" class="stp" data-stp="edReps" data-d="1">＋</button></div>
+        <div class="exf"><label>常规重量</label><button type="button" class="stp" data-stp="edWeight" data-d="-1">−</button><input type="number" inputmode="decimal" id="edWeight" placeholder="如 55" min="0" /><button type="button" class="stp" data-stp="edWeight" data-d="1">＋</button><button class="sr-unit" id="edUnitBtn" type="button">kg</button></div>
+        <div class="exf"><label>极限重量</label><button type="button" class="stp" data-stp="edMaxW" data-d="-1">−</button><input type="number" inputmode="decimal" id="edMaxW" placeholder="如 70" min="0" /><button type="button" class="stp" data-stp="edMaxW" data-d="1">＋</button><span class="exf-u">同单位</span></div>
+        <div class="exf"><label>目标RPE</label><button type="button" class="stp" data-stp="edRpe" data-d="-1">−</button><input type="number" inputmode="decimal" id="edRpe" placeholder="1-10" min="1" max="10" /><button type="button" class="stp" data-stp="edRpe" data-d="1">＋</button></div>
+        <div class="exf"><label>组间休息</label><button type="button" class="stp" data-stp="edRest" data-d="-1">−</button><input type="number" inputmode="numeric" id="edRest" placeholder="如 90" min="0" /><button type="button" class="stp" data-stp="edRest" data-d="1">＋</button><span class="exf-u">秒（步进15）</span></div>
       </div>
       <div id="edSubs" style="display:flex;flex-direction:column;gap:4px"></div>
       <div style="display:flex;gap:8px">
@@ -336,6 +459,67 @@ html.drag-lock,html.drag-lock body,html.drag-lock main{overflow:hidden!important
     <h3 id="txtTitle">提示</h3>
     <p id="txtBody"></p>
     <div class="actions"><button class="btn primary" id="txtOk">知道了</button></div>
+  </div>
+</div>
+
+<!-- 记组弹窗：打卡动作时逐组记录 重量×次数×RPE -->
+<div class="overlay hidden" id="ovSets">
+  <div class="modal">
+    <h3 id="srTitle">记组</h3>
+    <div class="sr-target" id="srTarget"></div>
+    <div class="sr-cur">
+      <div class="exf"><label>重量</label><button type="button" class="stp" data-stp="srW" data-d="-1">−</button><input type="number" inputmode="decimal" id="srW" placeholder="0" /><button type="button" class="stp" data-stp="srW" data-d="1">＋</button><button class="sr-unit" id="srUnit" type="button" title="点击切换单位">kg</button></div>
+      <div class="exf"><label>次数</label><button type="button" class="stp" data-stp="srR" data-d="-1">−</button><input type="number" inputmode="numeric" id="srR" placeholder="0" /><button type="button" class="stp" data-stp="srR" data-d="1">＋</button></div>
+      <div class="exf"><label>RPE</label><button type="button" class="stp" data-stp="srP" data-d="-1">−</button><input type="number" inputmode="decimal" id="srP" placeholder="可空" /><button type="button" class="stp" data-stp="srP" data-d="1">＋</button><button class="pill" id="srWu" type="button" title="热身组不计入PR和容量">热身</button></div>
+    </div>
+    <div class="actions" style="justify-content:flex-start;margin:10px 0 0">
+      <button class="btn primary" id="srAdd">✓ 记这组</button>
+      <button class="btn" id="srRest">⏱ 休息</button>
+    </div>
+    <div class="sr-list" id="srList"></div>
+    <div class="actions" style="margin-bottom:0">
+      <button class="btn" id="srQuick">仅打卡</button>
+      <button class="btn tw" id="srDone" style="flex:1">完成 ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- 动作详情：统计 + 趋势 + 历史 -->
+<div class="overlay hidden" id="ovDetail">
+  <div class="modal">
+    <div class="dt-head">
+      <span class="mini-chip" id="dtChip">?</span>
+      <span class="dt-name" id="dtName"></span>
+    </div>
+    <div class="sr-target" id="dtParam"></div>
+    <div class="dt-stats" id="dtStats"></div>
+    <div class="dt-chart" id="dtChart"></div>
+    <div class="dt-hist" id="dtHist"></div>
+    <div class="actions" style="margin-top:12px">
+      <button class="btn" id="dtEdit">⚙ 编辑</button>
+      <button class="btn primary" id="dtClose" style="flex:1">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 训练统计 -->
+<div class="overlay hidden" id="ovStats">
+  <div class="modal" style="max-width:340px">
+    <h3>📊 训练统计</h3>
+    <div id="stBody" style="max-height:60vh;overflow-y:auto;margin:10px 0"></div>
+    <div class="actions"><button class="btn primary" id="stClose">关闭</button></div>
+  </div>
+</div>
+
+<!-- 组间休息计时条 -->
+<div id="timerBar" class="hidden">
+  <div class="tb-prog"><i id="tbFill"></i></div>
+  <div class="tb-row">
+    <span class="tb-label" id="tbLabel">⏱ 组间休息</span>
+    <b id="tbTime">90</b><span class="tb-u">s</span>
+    <button class="tb-btn" id="tbMinus">−15</button>
+    <button class="tb-btn" id="tbPlus">+15</button>
+    <button class="tb-btn" id="tbStop">✕</button>
   </div>
 </div>
 
@@ -456,6 +640,95 @@ const isPlanLevel=()=>state.path.length===0;
 const isCatLevel=()=>state.path.length===1;
 const isExLevel=()=>state.path.length>=2;
 
+/* ================= 动作参数 / 记组 公共助手 ================= */
+const LBS2KG=0.45359237;
+const trimNum=n=>{ n=+n; return isFinite(n)? String(Math.round(n*100)/100):'0'; };
+const unitOf=(s,t)=> (s&&s.u) || (t&&t.ex&&t.ex.unit) || 'kg';
+const kgOfSet=s=> +(((+s.w||0) * (unitOf(s)==='lbs'?LBS2KG:1)).toFixed(1));
+// Epley 公式估算 1RM
+const e1RMw=(w,r)=> (w>0&&r>0)? w*(1+r/30) : 0;
+// 目标参数摘要：4×12 · 70lbs（极限85）· RPE8 · 休90s
+function exSummary(t){
+  const e=t&&t.ex; if(!e) return '';
+  const parts=[];
+  if(e.sets&&e.reps) parts.push(e.sets+'×'+e.reps);
+  else if(e.sets) parts.push(e.sets+'组');
+  else if(e.reps) parts.push('×'+e.reps);
+  if(e.weight!=null) parts.push(trimNum(e.weight)+(e.unit||'kg')+(e.maxWeight!=null?('（极限'+trimNum(e.maxWeight)+'）'):''));
+  else if(e.maxWeight!=null) parts.push('极限'+trimNum(e.maxWeight)+(e.unit||'kg'));
+  if(e.rpe) parts.push('RPE'+trimNum(e.rpe));
+  if(e.restSec) parts.push('休'+e.restSec+'s');
+  return parts.join(' · ');
+}
+// 单组文本：70lbs×12@8（每组都带单位）
+function fmtSet(s){
+  let str=trimNum(s.w)+unitOf(s)+'×'+trimNum(s.r);
+  if(s.rpe) str+='@'+trimNum(s.rpe);
+  return str;
+}
+// 完整链路名：方案>栏目>动作
+function fullChainNames(id){
+  function walk(node, chain){
+    if(!node) return null;
+    const next=chain.concat([node.name||'未命名']);
+    if(node.id===id) return next;
+    for(const s of (node.subs||[])){ const r=walk(s,next); if(r) return r; }
+    return null;
+  }
+  for(const p of (D.plans||[])){ const r=walk(p,[]); if(r) return r; }
+  return null;
+}
+// 某动作的历史记录（仅含记组数据），按时间升序
+function entriesForEx(t){
+  const out=[]; const suffix='>'+(t.name||'');
+  Object.keys(ACT.logs||{}).forEach(day=>{
+    (ACT.logs[day]||[]).forEach(e=>{
+      if(!e||!e.label) return;
+      const hasSets=e.sets&&e.sets.length;
+      if(e.exId===t.id || (!e.exId&&hasSets&&e.label.endsWith(suffix))) out.push({day,e});
+    });
+  });
+  out.sort((a,b)=>((a.e.ts||0)-(b.e.ts||0)) || (a.day<b.day?-1:1));
+  return out;
+}
+// 正式组（排除热身；全热身则视为正式）
+function workSets(entry){
+  const s=(entry&&entry.sets)||[]; const w=s.filter(x=>!x.wu);
+  return w.length?w:s;
+}
+function topSetOf(entry){
+  const ws=workSets(entry); if(!ws.length) return null;
+  return ws.reduce((a,b)=> kgOfSet(b)>=kgOfSet(a)?b:a);
+}
+function tonnageKg(entry){
+  return Math.round(workSets(entry).reduce((sum,s)=>sum+kgOfSet(s)*(+s.r||0),0));
+}
+// 历史最重正式组（PR）
+function prSetOf(entries){
+  let best=null;
+  entries.forEach(({e})=>{ workSets(e).forEach(s=>{ if(!best||kgOfSet(s)>kgOfSet(best)) best=s; }); });
+  return best;
+}
+function dateKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+// 连续打卡天数（今天未练不断链，从昨天回溯）
+function streakDays(){
+  let n=0; const d=new Date();
+  if(!actDayHas(dateKey(d))) d.setDate(d.getDate()-1);
+  while(actDayHas(dateKey(d))){ n++; d.setDate(d.getDate()-1); }
+  return n;
+}
+// 同日同 label 去重写入（重新记组时替换旧记录；仅打卡不覆盖已有组数据）
+function upsertActLog(day, entry){
+  if(!ACT.logs) ACT.logs={};
+  if(!ACT.logs[day]) ACT.logs[day]=[];
+  const old=ACT.logs[day].find(x=>x&&x.label===entry.label);
+  if(old && !entry.sets && old.sets) entry.sets=old.sets; // 保留之前的记组数据
+  ACT.logs[day]=ACT.logs[day].filter(x=>!(x&&x.label===entry.label));
+  ACT.logs[day].push(entry);
+  ACT.days[day]=ACT.logs[day].length;
+  persistAct();
+}
+
 /* ================= 渲染：磁贴页 ================= */
 function renderTiles(){
   const list=getList();
@@ -500,6 +773,21 @@ function tileHTML(t,i){
   const sessionOn = workout[t.id];
   const kids = (t.subs&&t.subs.length)? t.subs.length:null;
   const hasKids = kids!=null;
+  // 动作层：目标参数 + 历史（上次/PR）第二行
+  const exs = exSummary(t);
+  let hist='';
+  if(isExLevel() && isLeaf(t)){
+    const entries=entriesForEx(t);
+    if(entries.length){
+      const lastTop=topSetOf(entries[entries.length-1].e);
+      const pr=prSetOf(entries);
+      const parts=[];
+      if(lastTop) parts.push('上次 '+fmtSet(lastTop));
+      if(pr) parts.push('PR '+fmtSet(pr));
+      parts.push(entries.length+'次');
+      hist=parts.join(' · ');
+    }
+  }
   return `<div class="tile${t.done?' done':''}${sessionOn?' session':''}" data-id="${t.id}" style="--tc:${t.color}">
     <div class="tile-head">
       <span class="mini-chip" style="background:${t.color}">${esc(t.name[0]||'?')}</span>
@@ -514,6 +802,8 @@ function tileHTML(t,i){
       </div>
     </div>
     ${t.desc?`<div class="desc">${esc(t.desc)}</div>`:''}
+    ${exs?`<div class="ex-line">${esc(exs)}</div>`:''}
+    ${hist?`<div class="hist-line">${esc(hist)}</div>`:''}
   </div>`;
 }
 
@@ -523,6 +813,8 @@ function tileHTML(t,i){
 /* ================= 打卡 ================= */
 function toggleCheck(id){
   const t=findNodeById(id); if(!t) return;
+  // 动作叶子打卡：弹「记组」逐组记录重量×次数×RPE（已打卡再点=直接取消）
+  if(isLeaf(t) && state.path.length>=2 && !t.done){ openSetRecorder(t); return; }
   // 打卡/取消打卡：切换一次即可；叶子手动状态，父级由子项推导
   const newVal=!t.done;
   setSubtreeDone(t,newVal);
@@ -690,7 +982,16 @@ function normalizePlans(raw){
   catch(e){ throw new Error('不是有效的JSON文件'); }
   const arr = Array.isArray(obj) ? obj : (Array.isArray(obj&&obj.plans)? obj.plans: null);
   if(!arr || !arr.length) throw new Error('文件里没有健身方案');
-  // 逐条规范化：确保有 id/name/color/subs
+  // 逐条规范化：确保有 id/name/color/subs；动作参数 ex 透传
+  const fixEx=e=>{
+    if(!e||typeof e!=='object') return undefined;
+    const o={};
+    ['sets','reps','weight','maxWeight','rpe','restSec'].forEach(k=>{
+      const n=parseFloat(e[k]); if(isFinite(n)&&n>=0) o[k]=Math.round(n*100)/100;
+    });
+    if(e.unit==='lbs') o.unit='lbs';
+    return Object.keys(o).length? o:undefined;
+  };
   const fix=(t, isPlan)=>{
     if(!t||typeof t!=='object') return null;
     t.id = t.id||uid();
@@ -698,6 +999,7 @@ function normalizePlans(raw){
     t.color = PALETTE.includes(t.color)? t.color : rndColor();
     t.done = !!t.done;
     t.desc = t.desc||undefined;
+    t.ex = fixEx(t.ex);
     t.subs = Array.isArray(t.subs)? t.subs.map(s=>fix(s)).filter(Boolean) : [];
     return t;
   };
@@ -789,9 +1091,29 @@ function openEdit(t, isNew, isDraft){
   const lv=levelNoun();
   $('#ovEdit h3').textContent = isNew ? ('添加'+lv) : (asContainer? '编辑'+lv : '编辑动作');
   $('#edName').placeholder='名称';
-  // 描述行：容器层级显示
+  // 描述/备注行：所有层级可填（方案/栏目=描述，动作=备注，默认留空）
   const descRow=$('#edDescRow');
-  if(descRow){ descRow.classList.toggle('hidden', !asContainer); if($('#edDesc')) $('#edDesc').value=t.desc||''; }
+  if(descRow){
+    descRow.classList.remove('hidden');
+    const lb=$('#edDescLabel'); if(lb) lb.textContent = asContainer? '描述（可选）':'备注（可选）';
+    const ip=$('#edDesc');
+    if(ip){ ip.value=t.desc||''; ip.placeholder = asContainer? '例如：周期四天':'例如：曾抽筋 / 肩胛收紧'; }
+  }
+  // 动作参数行：动作层叶子显示
+  const exRow=$('#edExRow');
+  if(exRow){
+    exRow.classList.toggle('hidden', asContainer);
+    if(!asContainer){
+      const e=t.ex||{};
+      $('#edSets').value=e.sets!=null?e.sets:'';
+      $('#edReps').value=e.reps!=null?e.reps:'';
+      $('#edRpe').value=e.rpe!=null?e.rpe:'';
+      $('#edWeight').value=e.weight!=null?e.weight:'';
+      $('#edMaxW').value=e.maxWeight!=null?e.maxWeight:'';
+      $('#edRest').value=e.restSec!=null?e.restSec:'';
+      $('#edUnitBtn').textContent=e.unit||'kg';
+    }
+  }
   // 调色板
   $('#edPalette').innerHTML=PALETTE.map(c=>`<span class="swatch${t.color===c?' sel':''}" data-c="${c}" style="background:${c}"></span>`).join('');
   // 子项列表
@@ -808,6 +1130,7 @@ function openEdit(t, isNew, isDraft){
 }
 // 分享函数：编辑面板内按钮（用委托）
 $('#edPalette').addEventListener('click', e=>{ const s=e.target.closest('.swatch'); if(s){ $$('#edPalette .swatch').forEach(x=>x.classList.remove('sel')); s.classList.add('sel'); } });
+$('#edUnitBtn').addEventListener('click', ()=>{ const b=$('#edUnitBtn'); b.textContent = b.textContent==='kg'?'lbs':'kg'; });
 $('#edSubs').addEventListener('click', e=>{
   const rm=e.target.closest('[data-rm]'); if(!rm||!editing||!editing.subs) return;
   confirmModal('删除子项？',`将删除“${editing.subs.find(s=>s.id===rm.dataset.rm)?.name}”。`, ()=>{
@@ -827,6 +1150,21 @@ $('#edSave').addEventListener('click', ()=>{
   editing.name=($('#edName').value||'').trim()||'未命名';
   if($('#edDesc')&&!$('#edDescRow').classList.contains('hidden')) editing.desc=$('#edDesc').value.trim()||undefined;
   const sel=$('#edPalette .swatch.sel'); if(sel) editing.color=sel.dataset.c;
+  // 动作训练参数
+  if(!$('#edExRow').classList.contains('hidden')){
+    const num=q=>{ const v=parseFloat($(q).value); return (isFinite(v)&&v>=0)? v:undefined; };
+    const ex={};
+    const sets=num('#edSets'), reps=num('#edReps'), rpe=num('#edRpe');
+    const w=num('#edWeight'), mw=num('#edMaxW'), rest=num('#edRest');
+    if(sets>0) ex.sets=Math.round(sets);
+    if(reps>0) ex.reps=Math.round(reps);
+    if(rpe>0) ex.rpe=Math.min(10,Math.round(rpe*10)/10);
+    if(w!=null) ex.weight=w;
+    if(mw!=null) ex.maxWeight=mw;
+    if(rest>0) ex.restSec=Math.round(rest);
+    if($('#edUnitBtn').textContent==='lbs') ex.unit='lbs';
+    editing.ex=Object.keys(ex).length? ex:undefined;
+  }
   // 判断是新增草稿还是编辑已存在项
   if(editing._isDraft){
     delete editing._isDraft;
@@ -859,6 +1197,271 @@ function toggleWorkout(catId){
   recomputeFromLevel(D.plans);
   save(); renderTiles(); renderCal();
 }
+
+/* ================= 记组（动作打卡记录） ================= */
+let SR=null; // {t, rows:[{w,r,rpe,wu,u}]}
+function openSetRecorder(t){
+  SR={t, rows:[]};
+  $('#srTitle').textContent='记组 · '+t.name;
+  const exs=exSummary(t);
+  $('#srTarget').textContent = exs? ('目标 '+exs) : '未设置训练参数，可直接记录实际组';
+  $('#srUnit').textContent=(t.ex&&t.ex.unit)||'kg';
+  $('#srWu').classList.remove('on');
+  // 预填默认值：编辑动作里的参数优先（常规+极限都有 → 取极限），无参数再回退上次记录
+  const e=t.ex||{};
+  const entries=entriesForEx(t);
+  const lastTop=entries.length? topSetOf(entries[entries.length-1].e):null;
+  let w='',r='',p='';
+  if(e.weight!=null||e.maxWeight!=null){
+    w = (e.maxWeight!=null)? e.maxWeight : e.weight;
+    if(e.reps!=null) r=e.reps;
+    if(e.rpe!=null) p=e.rpe;
+  }else if(lastTop){
+    w=lastTop.w; r=lastTop.r; p=lastTop.rpe!=null?lastTop.rpe:'';
+    $('#srUnit').textContent=unitOf(lastTop);
+  }
+  $('#srW').value=w; $('#srR').value=r; $('#srP').value=p;
+  renderSrList();
+  showModal('ovSets');
+}
+function renderSrList(){
+  const box=$('#srList');
+  if(!SR||!SR.rows.length){
+    box.innerHTML='<p style="color:var(--muted);font-size:12px;text-align:center;padding:6px 0">还没有记录，做完一组点「✓ 记这组」</p>';
+    return;
+  }
+  box.innerHTML=SR.rows.map((s,i)=>{
+    return `<div class="sr-row${s.wu?' wu':''}">
+      <span class="no">${i+1}</span>
+      <span>${esc(fmtSet(s))}</span>
+      ${s.wu?'<span class="wutag">热身</span>':''}
+      <button class="rm" data-srrm="${i}">✕</button>
+    </div>`;
+  }).join('');
+}
+$('#srWu').addEventListener('click',()=>$('#srWu').classList.toggle('on'));
+$('#srUnit').addEventListener('click',()=>{ const b=$('#srUnit'); b.textContent=(b.textContent==='kg')?'lbs':'kg'; });
+$('#srAdd').addEventListener('click',()=>{
+  if(!SR) return;
+  const w=parseFloat($('#srW').value), r=parseFloat($('#srR').value), p=parseFloat($('#srP').value);
+  if(!isFinite(r)||r<1){ msg('请先填这一组的次数'); return; }
+  if(!isFinite(w)||w<0){ msg('请先填这一组的重量（自重填0）'); return; }
+  SR.rows.push({w:Math.round(w*100)/100, r:Math.round(r), rpe:(isFinite(p)&&p>0)?Math.round(p*10)/10:undefined,
+    wu:$('#srWu').classList.contains('on'), u:$('#srUnit').textContent});
+  renderSrList();
+  // 休息倒计时只在用户点「⏱ 休息」时启动，记组不自动触发
+});
+$('#srList').addEventListener('click',e=>{
+  const rm=e.target.closest('[data-srrm]'); if(!rm||!SR) return;
+  SR.rows.splice(+rm.dataset.srrm,1); renderSrList();
+});
+$('#srRest').addEventListener('click',()=>{ if(SR) requestRest((SR.t.ex&&SR.t.ex.restSec)||90); });
+$('#srDone').addEventListener('click',()=>finishSetRecord(false));
+$('#srQuick').addEventListener('click',()=>finishSetRecord(true));
+$('#ovSets').addEventListener('click',e=>{ if(e.target.id==='ovSets'){ hideModal('ovSets'); SR=null; } });
+// 完成打卡：组记录写入当日日志（同日同动作替换），并置打卡
+function finishSetRecord(quick){
+  if(!SR) return;
+  const t=SR.t;
+  const chain=fullChainNames(t.id)||[t.name];
+  const label=chain.join('>');
+  const entry={id:uid(), label, ts:Date.now(), exId:t.id};
+  if(!quick && SR.rows.length) entry.sets=SR.rows;
+  upsertActLog(todayKey(), entry);
+  setSubtreeDone(t,true);
+  hideModal('ovSets'); SR=null;
+  recomputeFromLevel(D.plans);
+  save(); renderTiles(); renderCal();
+}
+
+/* ================= 组间休息计时器 ================= */
+let TMR={end:0,total:0,iv:null,fin:false};
+// 原生计时插件（后台通知/结束提醒）；Web 环境无此插件则静默降级
+const YzTimerPlugin=()=>{ try{ return (window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.YzTimer)||null; }catch(e){ return null; } };
+// 请求开始休息：已有倒计时 → 先弹窗确认再重置
+function requestRest(sec){
+  if(!(sec>0)) return;
+  if(restActive()){
+    confirmModal('重新开始休息计时？',`当前已有休息倒计时，将被重置为 ${sec} 秒。`,()=>doStartRest(sec),'重置');
+  }else doStartRest(sec);
+}
+function doStartRest(sec){
+  const bar=$('#timerBar');
+  bar.classList.remove('hidden','done');
+  $('#tbLabel').textContent='⏱ 组间休息';
+  TMR.end=Date.now()+sec*1000;
+  TMR.total=sec;
+  TMR.fin=false;
+  ensureTick();
+  const P=YzTimerPlugin();
+  if(P&&P.start){ try{ P.start({seconds:sec}); }catch(e){} }
+  tickRest();
+}
+function ensureTick(){ clearInterval(TMR.iv); TMR.iv=setInterval(tickRest,200); }
+function tickRest(){
+  const left=Math.max(0,(TMR.end-Date.now())/1000);
+  $('#tbTime').textContent=String(Math.ceil(left));
+  $('#tbFill').style.width=Math.min(100,(left/TMR.total)*100)+'%';
+  if(left<=0 && !TMR.fin){
+    TMR.fin=true;
+    clearInterval(TMR.iv); TMR.iv=null;
+    $('#timerBar').classList.add('done');
+    $('#tbLabel').textContent='💪 休息结束，开练！';
+    ding();
+    try{ navigator.vibrate && navigator.vibrate([200,120,200]); }catch(e){}
+    // 不自动消失，等用户点 ✕ 关闭
+  }
+}
+function stopRest(){
+  clearInterval(TMR.iv); TMR.iv=null; TMR.fin=false;
+  $('#timerBar').classList.add('hidden');
+  $('#timerBar').classList.remove('done');
+  $('#tbLabel').textContent='⏱ 组间休息';
+  const P=YzTimerPlugin();
+  if(P&&P.stop){ try{ P.stop(); }catch(e){} }
+}
+const restActive=()=> !$('#timerBar').classList.contains('hidden');
+// 把网页端当前剩余时间同步给原生计时器（±15s 调整后调用，保证通知栏一致）
+function syncNativeRest(){
+  const P=YzTimerPlugin();
+  if(!P||!P.start) return;
+  const left=Math.max(0,Math.ceil((TMR.end-Date.now())/1000));
+  if(left>0){ try{ P.start({seconds:left}); }catch(e){} }
+}
+$('#tbPlus').addEventListener('click',()=>{
+  if(!restActive())return;
+  if(TMR.fin){ // 已结束的条上 +15 → 重新开始计时
+    $('#timerBar').classList.remove('done');
+    $('#tbLabel').textContent='⏱ 组间休息';
+    TMR.fin=false;
+    TMR.end=Date.now()+15000;
+  }else TMR.end+=15000;
+  TMR.total+=15;
+  ensureTick(); tickRest(); syncNativeRest();
+});
+$('#tbMinus').addEventListener('click',()=>{
+  if(!restActive()||TMR.fin)return;
+  TMR.end=Math.max(Date.now()+1000,TMR.end-15000);
+  ensureTick(); tickRest(); syncNativeRest();
+});
+$('#tbStop').addEventListener('click',stopRest);
+// 前台结束提示音：「叮—叮」
+function ding(){
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return;
+    const ac=new AC(); const t=ac.currentTime;
+    [[880,0],[1174.66,0.18]].forEach(a=>{
+      const o=ac.createOscillator(), g=ac.createGain();
+      o.type='sine'; o.frequency.value=a[0];
+      g.gain.setValueAtTime(0.0001,t+a[1]);
+      g.gain.exponentialRampToValueAtTime(0.3,t+a[1]+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+a[1]+0.5);
+      o.connect(g); g.connect(ac.destination);
+      o.start(t+a[1]); o.stop(t+a[1]+0.55);
+    });
+    setTimeout(()=>{ try{ac.close();}catch(e){} },1500);
+  }catch(e){}
+}
+// 回前台时立即校准倒计时显示（后台标记由原生生命周期自行维护，不经网页回传）
+try{
+  const CapApp=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
+  if(CapApp&&CapApp.addListener){
+    CapApp.addListener('appStateChange',(st)=>{
+      if(st.isActive) tickRest();
+    });
+  }
+}catch(e){}
+
+/* ================= 数字输入：左右步进按钮（移动端无原生箭头） ================= */
+const STEP_CFG={
+  edSets:{step:1,min:1,int:true}, edReps:{step:1,min:1,int:true},
+  edWeight:{step:1,min:0}, edMaxW:{step:1,min:0},
+  edRpe:{step:0.5,min:1,max:10,def:7}, edRest:{step:15,min:0,int:true,def:90},
+  srW:{step:1,min:0}, srR:{step:1,min:1,int:true}, srP:{step:0.5,min:1,max:10,def:7}
+};
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.stp'); if(!b) return;
+  const cfg=STEP_CFG[b.dataset.stp], el=document.getElementById(b.dataset.stp);
+  if(!cfg||!el) return;
+  let v=parseFloat(el.value);
+  if(!isFinite(v)) v=(cfg.def!=null)? cfg.def : (cfg.min!=null?cfg.min:0);
+  v+=cfg.step*((+b.dataset.d)||1);
+  v=cfg.int? Math.round(v) : Math.round(v*10)/10;
+  if(cfg.min!=null) v=Math.max(cfg.min,v);
+  if(cfg.max!=null) v=Math.min(cfg.max,v);
+  el.value=v;
+});
+// 长按连续步进（按住 450ms 后每 90ms 一次）
+let stpHoldT=null, stpHoldI=null;
+document.addEventListener('pointerdown',e=>{
+  const b=e.target.closest('.stp'); if(!b) return;
+  clearTimeout(stpHoldT); clearInterval(stpHoldI);
+  stpHoldT=setTimeout(()=>{ stpHoldI=setInterval(()=>b.click(),90); },450);
+});
+['pointerup','pointercancel'].forEach(ev=>document.addEventListener(ev,()=>{ clearTimeout(stpHoldT); clearInterval(stpHoldI); }));
+
+/* ================= 动作详情（统计 / 趋势 / 历史） ================= */
+let DT=null;
+function openDetail(t){
+  DT=t;
+  $('#dtChip').textContent=(t.name[0]||'?');
+  $('#dtChip').style.background=t.color;
+  $('#dtName').textContent=t.name;
+  const exs=exSummary(t);
+  $('#dtParam').textContent=exs? ('目标 '+exs) : '未设置训练参数（⚙ 编辑可添加）';
+  const entries=entriesForEx(t);
+  const pr=prSetOf(entries);
+  const last=entries.length? entries[entries.length-1]:null;
+  const lastTop=last? topSetOf(last.e):null;
+  const bestE1=entries.reduce((m,{e})=>{ const s=topSetOf(e); if(!s)return m; return Math.max(m, e1RMw(kgOfSet(s),s.r)); },0);
+  const totKg=entries.reduce((s,{e})=>s+tonnageKg(e),0);
+  const fmtKg=n=> n>=10000? (n/1000).toFixed(1)+'t' : String(Math.round(n));
+  $('#dtStats').innerHTML=`
+    <div class="dt-stat"><div class="v">${lastTop?esc(fmtSet(lastTop)):'-'}</div><div class="k">上次最佳组</div></div>
+    <div class="dt-stat"><div class="v">${pr?esc(trimNum(pr.w)+unitOf(pr)):'-'}</div><div class="k">PR重量</div></div>
+    <div class="dt-stat"><div class="v">${bestE1?Math.round(bestE1)+'kg':'-'}</div><div class="k">e1RM峰值</div></div>
+    <div class="dt-stat"><div class="v">${totKg?fmtKg(totKg):'-'}</div><div class="k">累计容量kg</div></div>`;
+  // 趋势：最近12次「最重正式组」重量（统一换算 kg）
+  const recent=entries.slice(-12);
+  const vals=recent.map(({e})=>{ const s=topSetOf(e); return s?kgOfSet(s):0; });
+  $('#dtChart').innerHTML = vals.length>=2
+    ? lineChartSvg(vals, recent.map(x=>x.day.slice(5)))
+    : '<p style="color:var(--muted);font-size:12px;text-align:center;padding:10px 0">趋势图至少需要2次记组</p>';
+  // 历史列表（新的在前，最多15条）
+  const list=entries.slice(-15).reverse();
+  $('#dtHist').innerHTML = list.length? list.map(({day,e})=>{
+    const sets=(e.sets||[]).map(s=>fmtSet(s)).join('，');
+    return `<div class="dt-hist-item">
+      <div class="dt-hist-top"><b>${esc(day)}</b><span style="color:#16a34a;font-size:12px">${tonnageKg(e)}kg</span></div>
+      <div class="dt-hist-sets">${esc(sets)}</div>
+    </div>`;
+  }).join('') : '<p style="color:var(--muted);font-size:12px;text-align:center;padding:10px 0">还没有记组记录，打卡时即可记录</p>';
+  showModal('ovDetail');
+}
+function lineChartSvg(vals, labels){
+  const W=272,H=96,P=8,PL=30; // PL: 左侧刻度文字宽度
+  let mx=Math.max(...vals), mn=Math.min(...vals);
+  if(mx===mn){ mx+=1; mn-=1; } // 数值全等时撑开区间，折线居中不贴轴
+  const span=mx-mn;
+  const px=i=> P+PL+((W-P-PL-4)*(vals.length===1?0.5:i/(vals.length-1)));
+  const py=v=> H-P-((H-2*P-12)*((v-mn)/span));
+  const pts=vals.map((v,i)=>[px(i),py(v)]);
+  const line=pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+  const dots=pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.6" fill="#4f6ef7"/>`).join('');
+  const lastPt=pts[pts.length-1];
+  const lastLab=`<text x="${W-P}" y="${Math.max(10,lastPt[1]-6).toFixed(1)}" font-size="10" fill="#4f6ef7" text-anchor="end">${trimNum(vals[vals.length-1])}kg</text>`;
+  const yMax=`<text x="2" y="${(py(mx)+3).toFixed(1)}" font-size="8" fill="#9aa3b2">${trimNum(mx)}</text>`;
+  const yMin=`<text x="2" y="${(py(mn)+3).toFixed(1)}" font-size="8" fill="#9aa3b2">${trimNum(mn)}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <line x1="${P+PL-4}" y1="${H-P}" x2="${W-P}" y2="${H-P}" stroke="#e5e7eb" stroke-width="1"/>
+    <polyline points="${line}" fill="none" stroke="#4f6ef7" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}${lastLab}${yMax}${yMin}
+  </svg>
+  <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);padding:0 4px 0 ${PL+4}px"><span>${labels[0]||''}</span><span>${labels[labels.length-1]||''}</span></div>`;
+}
+$('#dtClose').addEventListener('click',()=>hideModal('ovDetail'));
+$('#ovDetail').addEventListener('click',e=>{ if(e.target.id==='ovDetail') hideModal('ovDetail'); });
+$('#dtEdit').addEventListener('click',()=>{ if(DT){ hideModal('ovDetail'); openEdit(DT); } });
 
 /* ================= 日历 / 运动打卡记录 ================= */
 let ACT={days:{},logs:{}};
@@ -917,6 +1520,8 @@ function renderCal(){
   $('#calTitle').textContent=`${y}年${m+1}月`;
   const el=document.getElementById('calDoneDays');
   if(el) el.textContent=String(doneDaysCount());
+  const st=document.getElementById('calStreak');
+  if(st) st.textContent=String(streakDays());
   const first=new Date(y,m,1).getDay();
   const days=new Date(y,m+1,0).getDate();
   const todayStr=todayKey();
@@ -948,10 +1553,21 @@ function renderDayDetail(){
   box.innerHTML=head+`<div class="cal-log-list" id="calLogList">`+sorted.map(item=>{
     const t=new Date(item.ts||0);
     const hh=String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0');
+    // 记组数据：每组成一个小 chip + 当日总容量
+    const sets=(item.sets&&item.sets.length)? item.sets:null;
+    let chips='';
+    if(sets){
+      chips='<div class="set-chips">'+sets.map(s=>{
+        return `<span class="set-chip${s.wu?' wu':''}" title="${s.wu?'热身组':''}">${esc(fmtSet(s))}</span>`;
+      }).join('')+`<span class="ton-chip">${tonnageKg(item)}kg</span></div>`;
+    }
     return `<div class="cal-log-item" data-log="${esc(item.id)}" data-day="${esc(k)}">
-      <span class="label">${esc(item.label||'')}</span>
-      <span class="ts">${hh}</span>
-      <button class="del-x" data-del-log="${esc(item.id)}" data-del-day="${esc(k)}">✕</button>
+      <div class="log-main">
+        <span class="label">${esc(item.label||'')}</span>
+        <span class="ts">${hh}</span>
+        <button class="del-x" data-del-log="${esc(item.id)}" data-del-day="${esc(k)}">✕</button>
+      </div>
+      ${chips}
     </div>`;
   }).join('')+`</div>`;
 }
@@ -1030,13 +1646,86 @@ function renderMe(){
     <div class="me-sec-title">数据管理</div>
     <div class="me-card" id="meCardTransfer">📋 导出 / 导入方案 <span class="me-arrow">›</span></div>
     <div class="me-card" id="meCardActivity">📊 导出 / 导入运动数据 <span class="me-arrow">›</span></div>
+    <div class="me-card" id="meCardStats">📈 训练统计 <span class="me-arrow">›</span></div>
     <div class="me-card" id="meCardBin">🗑 回收站 <span class="me-arrow">›</span></div>
     <div class="me-sec-title" style="margin-top:18px">关于</div>
-    <div class="me-card" style="justify-content:center;color:var(--muted);font-size:13px">云舟健身 v1.5 · 本地数据</div>`;
+    <div class="me-card" style="justify-content:center;color:var(--muted);font-size:13px">云舟健身 v1.6 · 本地数据</div>`;
   $('#meCardTransfer').addEventListener('click', openTransfer);
   $('#meCardActivity').addEventListener('click', openActivityTransfer);
+  $('#meCardStats').addEventListener('click', openStats);
   $('#meCardBin').addEventListener('click', openBin);
 }
+
+/* ================= 训练统计 ================= */
+function openStats(){
+  const allDays=Object.keys(ACT.logs||{}).filter(k=>(ACT.logs[k]||[]).length);
+  const streak=streakDays();
+  const now=new Date();
+  const prefix=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  // 本月汇总
+  let monthDays=0, monthSets=0, monthKg=0;
+  Object.keys(ACT.logs||{}).forEach(day=>{
+    if(!day.startsWith(prefix)) return;
+    if((ACT.logs[day]||[]).length) monthDays++;
+    ACT.logs[day].forEach(e=>{ if(e.sets&&e.sets.length){ monthSets+=workSets(e).length; monthKg+=tonnageKg(e); } });
+  });
+  // 近6周容量（周一为一周开始，含本周）
+  const monday=new Date(now); monday.setDate(now.getDate()-((now.getDay()+6)%7));
+  const weeks=[];
+  for(let i=5;i>=0;i--){
+    const s=new Date(monday); s.setDate(monday.getDate()-7*i);
+    const e=new Date(s); e.setDate(s.getDate()+6);
+    const sk=dateKey(s), ek=dateKey(e);
+    let kg=0;
+    Object.keys(ACT.logs||{}).forEach(day=>{
+      if(day>=sk&&day<=ek) (ACT.logs[day]||[]).forEach(x=>{ if(x.sets&&x.sets.length) kg+=tonnageKg(x); });
+    });
+    weeks.push({label:(s.getMonth()+1)+'/'+s.getDate(), kg});
+  }
+  const maxW=Math.max(1,...weeks.map(w=>w.kg));
+  const bars=weeks.map(w=>`<div class="st-bar">
+      <span class="vv">${w.kg?Math.round(w.kg):''}</span>
+      <i style="height:${Math.max(2,(w.kg/maxW)*70)}px"></i>
+      <span class="lb">${w.label}</span>
+    </div>`).join('');
+  // 部位占比：近90天按「栏目」聚合容量
+  const cut=new Date(); cut.setDate(cut.getDate()-90);
+  const cutStr=dateKey(cut);
+  const catMap={};
+  Object.keys(ACT.logs||{}).forEach(day=>{
+    if(day<cutStr) return;
+    (ACT.logs[day]||[]).forEach(e=>{
+      if(!e.sets||!e.sets.length) return;
+      const parts=(e.label||'').split('>');
+      const cat=parts[1]||parts[0]||'其他';
+      catMap[cat]=(catMap[cat]||0)+tonnageKg(e);
+    });
+  });
+  const cats=Object.keys(catMap).map(k=>({k,v:catMap[k]})).sort((a,b)=>b.v-a.v).slice(0,6);
+  const catTot=cats.reduce((s,c)=>s+c.v,0)||1;
+  const catColor={};
+  for(const p of (D.plans||[])) for(const c of (p.subs||[])) if(c&&c.name) catColor[c.name]=c.color;
+  const catBars=cats.length? cats.map(c=>`<div class="st-cat">
+      <span class="nm">${esc(c.k)}</span>
+      <span class="bar-bg"><i style="width:${Math.round(c.v/catTot*100)}%;background:${catColor[c.k]||'#4f6ef7'}"></i></span>
+      <span class="pct">${Math.round(c.v/catTot*100)}%</span>
+    </div>`).join('') : '<p style="color:var(--muted);font-size:12px;padding:4px 0">近90天暂无记组数据</p>';
+  const fmtKg=n=> n>=10000? (n/1000).toFixed(1)+'t' : String(Math.round(n));
+  $('#stBody').innerHTML=`
+    <div class="st-nums">
+      <div class="st-num"><div class="v">${streak}</div><div class="k">连续打卡(天)</div></div>
+      <div class="st-num"><div class="v">${allDays.length}</div><div class="k">累计打卡(天)</div></div>
+      <div class="st-num"><div class="v">${monthDays}</div><div class="k">本月训练(天)</div></div>
+    </div>
+    <div class="st-sec">本月：正式组 <b style="color:var(--txt)">${monthSets}</b> 组 · 容量 <b style="color:var(--txt)">${fmtKg(monthKg)}</b> kg（lbs 按公制换算）</div>
+    <div class="st-sec">近6周训练容量（kg）</div>
+    <div class="st-bars">${bars}</div>
+    <div class="st-sec">近90天部位容量占比</div>
+    ${catBars}`;
+  showModal('ovStats');
+}
+$('#stClose').addEventListener('click',()=>hideModal('ovStats'));
+$('#ovStats').addEventListener('click',e=>{ if(e.target.id==='ovStats') hideModal('ovStats'); });
 
 /* 运动数据导出 / 导入（与方案导出导入区分） */
 let transferMode='plan';
@@ -1121,7 +1810,17 @@ function doImportActivity(){
                   const label=item.label||'未知';
                   // 同日同内容只保留一条
                   if(!ACT.logs[k].some(x=>x&&x.label===label)){
-                    ACT.logs[k].push({ id:item.id||uid(), label, ts:item.ts||Date.now() });
+                    const ent={ id:item.id||uid(), label, ts:item.ts||Date.now() };
+                    if(item.exId) ent.exId=item.exId;
+                    // 组记录：重量×次数×RPE×热身×单位
+                    if(Array.isArray(item.sets)&&item.sets.length){
+                      ent.sets=item.sets.filter(s=>s&&isFinite(+s.w)&&isFinite(+s.r)).map(s=>({
+                        w:+s.w, r:+s.r,
+                        rpe:(s.rpe!=null&&isFinite(+s.rpe))? Math.round(+s.rpe*10)/10 : undefined,
+                        wu:!!s.wu, u:(s.u==='lbs')?'lbs':'kg'
+                      }));
+                    }
+                    ACT.logs[k].push(ent);
                   }
                 }
               });
@@ -1473,10 +2172,10 @@ $('#page-tiles').addEventListener('click', e=>{
     e.stopImmediatePropagation();
     const t=findNodeById(tile.dataset.id);
     if(!t) return;
-    // 方案层/栏目层是容器：空的也可进入继续添加；动作层点编辑
+    // 方案层/栏目层是容器：空的也可进入继续添加；动作层点开详情（统计/趋势/历史）
     const canEnter = state.path.length < 2 || (Array.isArray(t.subs) && t.subs.length>0);
     if(canEnter){ state.path.push(t.id); renderTiles(); }
-    else { openEdit(t); }
+    else { openDetail(t); }
   }
 });
 
@@ -1502,7 +2201,7 @@ function init(){
       });
     }
   }catch(e){}
-  document.title='云舟健身 v1.5';
+  document.title='云舟健身 v1.6';
 }
 init();
 </script>
